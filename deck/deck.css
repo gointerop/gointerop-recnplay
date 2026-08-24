@@ -388,3 +388,90 @@ kbd {
 .apoio .pessoa { width: clamp(90px, 11vw, 168px); }
 
 #palco.com-painel .apoio { display: none; }
+
+/* ----------------------------------------------------------- mapa -- */
+
+.slide-mapa { gap: .8rem; }
+
+.mapa {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 340px);
+  gap: 1.6rem;
+  align-items: center;
+  min-height: 0;
+}
+
+/* O viewBox e quase quadrado; deixar o SVG ocupar toda a coluna so cria
+   letterbox lateral. Amarrar pela altura mantem o desenho no tamanho util. */
+.mapa-svg { height: min(58vh, 460px); width: auto; max-width: 100%; justify-self: center; }
+
+/* O contorno e pintado por atributo no proprio <symbol>, e nao aqui: o <use>
+   instancia o simbolo num shadow tree, e seletor CSS do documento nao cruza
+   essa fronteira. Regra daqui deixaria o mapa preto sobre o fundo navy. */
+
+.mapa-svg .ponto {
+  fill: var(--cyan-400);
+  opacity: .9;
+  transition: opacity .45s ease, r .45s ease;
+}
+
+/* Um ponto que some continua ocupando o lugar: o olho acompanha o
+   desaparecimento, que e justamente o que o slide quer mostrar. */
+.mapa-svg .ponto.oculto { opacity: 0; }
+
+.mapa-svg .ponto.destaque { fill: var(--white); }
+
+#mapa-pontos.final .ponto.destaque {
+  fill: var(--white);
+  animation: pulso-ponto 1.6s ease-in-out infinite;
+}
+
+@keyframes pulso-ponto {
+  0%, 100% { r: 7; opacity: 1; }
+  50%      { r: 11; opacity: .55; }
+}
+
+.mapa-lado { display: flex; flex-direction: column; gap: .35rem; }
+
+.mapa-nivel {
+  font-size: .82em;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--cyan-400);
+  min-height: 2.4em;
+}
+
+.mapa-total {
+  font-size: clamp(3.4rem, 8vw, 7rem);
+  font-weight: 800;
+  line-height: .95;
+  letter-spacing: -.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.mapa-unidade { font-size: .88em; color: var(--muted); line-height: 1.4; }
+
+.mapa-nota {
+  font-size: .8em;
+  color: var(--warn);
+  line-height: 1.45;
+  border-left: 2px solid var(--warn);
+  padding-left: .6rem;
+  margin-top: .5rem;
+}
+
+.mapa-fonte { font-size: .72em; color: var(--dim); line-height: 1.45; margin-top: auto; }
+
+/* A frase de fecho so aparece no ultimo fragmento. */
+.so-final { opacity: 0; transition: opacity .5s ease; }
+.slide[data-fragmento="3"] .so-final { opacity: 1; }
+
+/* Nomes de clientes: tipografia, sem logotipo. */
+.grandes-nomes {
+  color: var(--white);
+  font-size: 1.06em;
+  font-weight: 700;
+  line-height: 1.6;
+  margin-top: .35rem;
+}

@@ -1,0 +1,47 @@
+{
+  "fonte": "Diretório de certificação da HL7 International",
+  "url": "https://www.hl7.org/implement/certificationdirectory.cfm",
+  "consultadoEm": "2026-08-24",
+  "observacao": "Contagem de pessoas distintas. O diretório lista uma linha por certificação, e a mesma pessoa aparece mais de uma vez.",
+
+  "niveis": [
+    { "id": "foundational", "rotulo": "FHIR Foundational Implementer" },
+    { "id": "proficient", "rotulo": "FHIR R4 / STU3 Proficient" },
+    { "id": "developer", "rotulo": "FHIR Advanced Developer" },
+    {
+      "id": "architect",
+      "rotulo": "FHIR Advanced Architect",
+      "naoConstaNoDiretorio": true,
+      "nota": "A credencial Advanced Architect ainda não consta como categoria filtrável no diretório público da HL7."
+    }
+  ],
+
+  "paises": [
+    {
+      "pais": "Brasil", "lat": -11.0, "lon": -50.0, "raioX": 42, "raioY": 46,
+      "contagens": { "foundational": 8, "proficient": 3, "developer": 3, "architect": 1 },
+      "destaque": { "cidade": "Recife", "lat": -8.05, "lon": -34.9, "nivel": "architect" }
+    },
+    {
+      "pais": "Argentina", "lat": -35.0, "lon": -64.5, "raioX": 17, "raioY": 38,
+      "contagens": { "foundational": 3, "proficient": 2, "developer": 2, "architect": 1 }
+    },
+    {
+      "pais": "Chile", "lat": -35.0, "lon": -71.3, "raioX": 6, "raioY": 40,
+      "contagens": { "foundational": 4, "proficient": 4, "developer": 2, "architect": 0 }
+    },
+    {
+      "pais": "Colômbia", "lat": 4.0, "lon": -73.5, "raioX": 15, "raioY": 15,
+      "contagens": { "foundational": 1, "proficient": 2, "developer": 0, "architect": 0 }
+    },
+    {
+      "pais": "Peru", "lat": -10.0, "lon": -75.0, "raioX": 15, "raioY": 22,
+      "contagens": { "foundational": 4, "proficient": 0, "developer": 0, "architect": 0 }
+    }
+  ],
+
+  "naoConsultados": [
+    "México", "Uruguai", "Equador", "Bolívia", "Paraguai", "Venezuela",
+    "Costa Rica", "Panamá", "Guatemala", "República Dominicana", "Cuba"
+  ]
+}
