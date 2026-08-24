@@ -15,6 +15,7 @@ import { spawn } from 'node:child_process';
 import { createWriteStream, readFileSync, existsSync, mkdirSync, writeFileSync, unlinkSync, renameSync, statSync, readdirSync, watch } from 'node:fs';
 import { resolve, dirname, join, relative, extname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { randomUUID } from 'node:crypto';
 import { resolverClaude, versaoDoClaude } from '../tools/claude-bin.mjs';
 
 const DECK = dirname(fileURLToPath(import.meta.url));
@@ -128,9 +129,17 @@ function temGravacao(id) {
   return existsSync(f) && statSync(f).size > 0;
 }
 
+/**
+ * Identificador da cadeia de passos, gerado a cada nova cadeia. Ver o comentario
+ * equivalente em tools/run-step.mjs: id fixo so serve uma vez por maquina.
+ */
+function sessaoAtual() {
+  if (existsSync(STATE)) return { id: readFileSync(STATE, 'utf8').trim(), nova: false };
+  return { id: randomUUID(), nova: true };
+}
+
 function runLive(step) {
-  const first = !existsSync(STATE);
-  const session = first ? STEPS.sessionId : readFileSync(STATE, 'utf8').trim();
+  const { id: session, nova: first } = sessaoAtual();
 
   // O prompt vai por stdin, nunca por argv — ver comentario em tools/run-step.mjs.
   const argv = [
@@ -254,7 +263,7 @@ function atender(req, res) {
   // --- metadados dos passos ---
   if (p === '/api/steps') {
     return json(res, 200, {
-      sessionId: STEPS.sessionId,
+      sessionId: sessaoAtual().id,
       steps: STEPS.steps.map((s) => ({
         id: s.id, slide: s.slide, title: s.title, bloco: s.bloco,
         prompt: s.prompt,
@@ -330,7 +339,7 @@ servidor.on('error', (e) => {
 
 servidor.listen(PORT, () => {
   console.log(`\n  deck   http://localhost:${PORT}`);
-  console.log(`  passos ${STEPS.steps.length}   sessao ${STEPS.sessionId}`);
+  console.log(`  passos ${STEPS.steps.length}   sessao ${sessaoAtual().id}`);
   console.log(`  observando ${WATCHED.join(', ')}`);
 
   if (CLAUDE) {
