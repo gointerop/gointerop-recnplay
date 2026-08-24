@@ -28,7 +28,11 @@
       "slide": "demo-2a",
       "title": "Implementar a fachada",
       "bloco": "DEMO 2",
-      "prompt": "/opsx:apply fachada-fhir-paciente\n\nImplemente em `fhir-facade/`, seguindo as tasks.\n\nStack já validada nesta máquina, use exatamente estas versões:\n\n- Java 25, Maven, parent `spring-boot-starter-parent` 4.1.1\n- HAPI FHIR 8.10.1: `hapi-fhir-structures-r4`, `hapi-fhir-server`, `hapi-fhir-server-openapi`, `hapi-fhir-validation`, `hapi-fhir-validation-resources-r4`\n- Driver PostgreSQL 42.7.13, acesso por `spring-boot-starter-jdbc` com `JdbcTemplate`\n- Testcontainers 1.21.4 para os testes de integração\n- JaCoCo 0.8.15 com regra de cobertura mínima de 90% que **quebra o build** se não atingir\n\nPadrão obrigatório: **Plain Server / Facade** do HAPI. Um `IResourceProvider` de `Patient` que lê do Postgres e monta o recurso em memória. Nada de JPA server, nada de persistir FHIR.\n\nRegistre o `OpenApiInterceptor` para servir `/swagger-ui/`.\n\nBanco de homologação local:\n\n    jdbc:postgresql://localhost:55432/sigh   usuário integracao_ro / integracao_ro\n\nOperações de busca desta entrega: por `_id`, por `identifier`, por `name`, por `birthdate` e por `_lastUpdated`.\n\nEscreva os testes junto com o código, não depois. Cada scenario da spec vira um teste."
+      "prompt": "/opsx:apply fachada-fhir-paciente\n\nImplemente em `fhir-facade/`, seguindo as tasks.\n\nStack já validada nesta máquina, use exatamente estas versões:\n\n- Java 25, Maven, parent `spring-boot-starter-parent` 4.1.1\n- HAPI FHIR 8.10.1: `hapi-fhir-structures-r4`, `hapi-fhir-server`, `hapi-fhir-server-openapi`, `hapi-fhir-validation`, `hapi-fhir-validation-resources-r4`\n- Driver PostgreSQL 42.7.13, acesso por `spring-boot-starter-jdbc` com `JdbcTemplate`\n- Testcontainers 1.21.4 para os testes de integração\n- JaCoCo 0.8.15 com regra de cobertura mínima de 90% que **quebra o build** se não atingir\n\nPadrão obrigatório: **Plain Server / Facade** do HAPI. Um `IResourceProvider` de `Patient` que lê do Postgres e monta o recurso em memória. Nada de JPA server, nada de persistir FHIR.\n\nRegistre o `OpenApiInterceptor` para servir `/swagger-ui/`.\n\nBanco de homologação local:\n\n    jdbc:postgresql://localhost:55432/sigh   usuário integracao_ro / integracao_ro\n\nOperações de busca desta entrega: por `_id`, por `identifier`, por `name`, por `birthdate` e por `_lastUpdated`.\n\nEscreva os testes junto com o código, não depois. Cada scenario da spec vira um teste.",
+      "materializa": [
+        "openspec",
+        "fhir-facade"
+      ]
     },
     {
       "id": "05",
@@ -51,5 +55,6 @@
       "bloco": "DEMO 3",
       "prompt": "/opsx:archive fachada-fhir-paciente\n\nArquive a change e mostre o que ficou nas specs permanentes.\n\nDepois me diga, em poucas linhas: se amanhã entrar uma pessoa nova no time e ela precisar entender por que `tp_sexo = 'I'` virou `unknown`, onde exatamente ela encontra essa resposta?"
     }
-  ]
+  ],
+  "referenciaMaterializacao": "main"
 }
