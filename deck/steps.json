@@ -1,4 +1,5 @@
 {
+  "instrucaoDeSistema": "Responda sempre em português do Brasil. Este é um material de oficina apresentado ao vivo: o texto que você produzir aparece projetado numa tela para uma plateia brasileira. Seja direto e evite jargão desnecessário.",
   "projeto": "Fachada FHIR R4 de Patient sobre o SIGH",
   "steps": [
     {
