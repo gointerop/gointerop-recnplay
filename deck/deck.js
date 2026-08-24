@@ -26,6 +26,7 @@ const ui = {
 };
 
 let atual = 0;
+let fragmento = 0;
 let modo = 'live';
 let rodando = null;
 let inicio = 0;
@@ -35,12 +36,24 @@ ui.total.textContent = slides.length;
 
 // ------------------------------------------------------------ slides --
 
-function mostrar(i) {
+/** Quantos avancos o slide comporta antes de passar para o proximo. */
+const fragmentosDe = (slide) => Number(slide.dataset.fragmentos ?? 0);
+
+/**
+ * @param {number} i indice do slide
+ * @param {'inicio'|'fim'} entrada de que lado se entra — voltar para um slide
+ *   com fragmentos precisa cair no ultimo, e nao no primeiro, senao a navegacao
+ *   de tras para frente parece pular etapas.
+ */
+function mostrar(i, entrada = 'inicio') {
   atual = Math.max(0, Math.min(slides.length - 1, i));
   slides.forEach((s, k) => s.classList.toggle('ativo', k === atual));
 
   const slide = slides[atual];
   const step = slide.dataset.step;
+
+  fragmento = entrada === 'fim' ? fragmentosDe(slide) : 0;
+  aplicarFragmento();
 
   palco.classList.toggle('com-painel', Boolean(step));
   if (step && passos[step]) {
@@ -53,6 +66,30 @@ function mostrar(i) {
   ui.progresso.style.width = `${((atual + 1) / slides.length) * 100}%`;
 
   location.hash = String(atual + 1);
+}
+
+function aplicarFragmento() {
+  const slide = slides[atual];
+  slide.dataset.fragmento = String(fragmento);
+  if (slide.dataset.mapa !== undefined) desenharNivel(fragmento);
+}
+
+function avancar() {
+  if (fragmento < fragmentosDe(slides[atual])) {
+    fragmento++;
+    aplicarFragmento();
+  } else {
+    mostrar(atual + 1);
+  }
+}
+
+function recuar() {
+  if (fragmento > 0) {
+    fragmento--;
+    aplicarFragmento();
+  } else {
+    mostrar(atual - 1, 'fim');
+  }
 }
 
 // ------------------------------------------------------------ painel --
@@ -202,8 +239,8 @@ addEventListener('keydown', (e) => {
     return;
   }
   switch (e.key) {
-    case 'ArrowRight': case ' ': case 'PageDown': mostrar(atual + 1); break;
-    case 'ArrowLeft': case 'PageUp': mostrar(atual - 1); break;
+    case 'ArrowRight': case ' ': case 'PageDown': avancar(); break;
+    case 'ArrowLeft': case 'PageUp': recuar(); break;
     case 'Home': mostrar(0); break;
     case 'End': mostrar(slides.length - 1); break;
     case 's': case 'S': disparar(); break;
@@ -213,17 +250,139 @@ addEventListener('keydown', (e) => {
   }
 });
 
+
+// ------------------------------------------------------------- mapa --
+/*
+ * Mapa de certificacoes FHIR na America Latina.
+ *
+ * Os pontos sao gerados a partir de deck/certificacoes.json, e nao escritos no
+ * HTML: quando chegarem os dados dos paises que faltam, basta acrescentar
+ * entradas no JSON.
+ */
+
+let certificacoes = null;
+
+/**
+ * Projecao equirretangular, identica a usada para tracar a silhueta em
+ * deck/pessoas.html. Mantendo a mesma formula nos dois lugares, os pontos caem
+ * no lugar certo sem ajuste manual.
+ */
+const proj = (lat, lon) => ({ x: (lon + 118) * 5, y: (33 - lat) * 5 });
+
+/** PRNG com semente, para que a dispersao dos pontos seja sempre a mesma. */
+function prng(semente) {
+  let s = semente >>> 0;
+  return () => {
+    s = (s + 0x6d2b79f5) | 0;
+    let t = Math.imul(s ^ (s >>> 15), 1 | s);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+const semear = (texto) => [...texto].reduce((h, c) => (h * 31 + c.charCodeAt(0)) | 0, 7);
+
+/**
+ * Um ponto por profissional, do mais persistente para o menos.
+ *
+ * A ordem importa: no nivel N ficam visiveis os primeiros `contagem[N]` pontos
+ * do pais. Como o ponto de destaque e sempre o primeiro, ele e o ultimo a
+ * sobrar — e o mapa termina com Recife aceso.
+ */
+function pontosDoPais(pais) {
+  const pontos = [];
+  if (pais.destaque) {
+    pontos.push({ ...proj(pais.destaque.lat, pais.destaque.lon), rotulo: pais.destaque.cidade });
+  }
+  const base = proj(pais.lat, pais.lon);
+  const aleatorio = prng(semear(pais.pais));
+  const maximo = Math.max(...Object.values(pais.contagens));
+  while (pontos.length < maximo) {
+    const angulo = aleatorio() * Math.PI * 2;
+    const raio = Math.sqrt(aleatorio());
+    pontos.push({
+      x: base.x + Math.cos(angulo) * raio * pais.raioX,
+      y: base.y + Math.sin(angulo) * raio * pais.raioY,
+    });
+  }
+  return pontos;
+}
+
+async function montarMapa() {
+  const alvo = document.getElementById('mapa-pontos');
+  if (!alvo) return;
+
+  try {
+    certificacoes = await (await fetch('certificacoes.json')).json();
+  } catch {
+    linha('erro', 'não foi possível carregar certificacoes.json');
+    return;
+  }
+
+  const NS = 'http://www.w3.org/2000/svg';
+  for (const pais of certificacoes.paises) {
+    pontosDoPais(pais).forEach((ponto, ordem) => {
+      const c = document.createElementNS(NS, 'circle');
+      c.setAttribute('cx', ponto.x.toFixed(1));
+      c.setAttribute('cy', ponto.y.toFixed(1));
+      c.setAttribute('r', ponto.rotulo ? 7 : 5);
+      c.setAttribute('class', 'ponto' + (ponto.rotulo ? ' destaque' : ''));
+      c.dataset.pais = pais.pais;
+      c.dataset.ordem = String(ordem);
+      if (ponto.rotulo) c.dataset.cidade = ponto.rotulo;
+      alvo.append(c);
+    });
+  }
+
+  const fonte = document.getElementById('mapa-fonte');
+  if (fonte) {
+    const consulta = certificacoes.consultadoEm.split('-').reverse().join('/');
+    fonte.textContent = `${certificacoes.fonte}, consultado em ${consulta}. `
+      + `Países consultados: ${certificacoes.paises.map((p) => p.pais).join(', ')}.`;
+  }
+
+  desenharNivel(0);
+}
+
+/** Aplica o nivel correspondente ao fragmento atual. */
+function desenharNivel(indice) {
+  if (!certificacoes) return;
+  const nivel = certificacoes.niveis[Math.min(indice, certificacoes.niveis.length - 1)];
+
+  let total = 0;
+  for (const c of document.querySelectorAll('#mapa-pontos .ponto')) {
+    const pais = certificacoes.paises.find((p) => p.pais === c.dataset.pais);
+    const visivel = Number(c.dataset.ordem) < pais.contagens[nivel.id];
+    c.classList.toggle('oculto', !visivel);
+    if (visivel) total++;
+  }
+
+  const rotulo = document.getElementById('mapa-nivel');
+  if (rotulo) rotulo.textContent = nivel.rotulo;
+
+  const numero = document.getElementById('mapa-total');
+  if (numero) numero.textContent = String(total);
+
+  const nota = document.getElementById('mapa-nota');
+  if (nota) {
+    nota.textContent = nivel.nota ?? '';
+    nota.hidden = !nivel.nota;
+  }
+
+  document.getElementById('mapa-pontos')?.classList.toggle('final', Boolean(nivel.naoConstaNoDiretorio));
+}
+
 // ------------------------------------------------------------ inicio --
 
 /**
- * Injeta as ilustracoes das personas.
+ * Injeta os simbolos SVG: ilustracoes das personas e a silhueta do mapa.
  *
  * Ficam num arquivo separado para nao inchar o index.html, e sao injetadas em vez
  * de referenciadas por <use href="arquivo.svg#id">: o Chrome nao resolve <use>
  * para documento externo. Depois da injecao, os href sao reescritos para forcar a
  * re-resolucao dos <use> que ja estavam no DOM.
  */
-async function carregarPessoas() {
+async function carregarSvg() {
   try {
     const svg = await (await fetch('pessoas.html')).text();
     document.body.insertAdjacentHTML('afterbegin', svg);
@@ -238,7 +397,8 @@ async function carregarPessoas() {
 }
 
 (async () => {
-  await carregarPessoas();
+  await carregarSvg();
+  await montarMapa();
   try {
     const dados = await (await fetch('/api/steps')).json();
     passos = Object.fromEntries(dados.steps.map((s) => [s.id, s]));
