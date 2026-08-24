@@ -1,5 +1,8 @@
 # Setup
 
+> Este documento é a referência detalhada. Para montar o ambiente do zero, o caminho mais curto
+> é o [runbook por agente](runbook-ambiente.md).
+
 ## Requisitos
 
 | | Versão validada |

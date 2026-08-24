@@ -29,7 +29,7 @@ Faça na véspera, e refaça na manhã do dia. Leva dez minutos e cobre tudo o q
 
 - [ ] Docker aberto e contêiner de pé **60 minutos antes** — não deixe para 8h55
 - [ ] `node deck/runner.mjs` e abrir `http://localhost:4173`
-- [ ] Verificar que o painel lateral abre no slide 18 (primeiro passo)
+- [ ] Verificar que o painel lateral abre no slide 19 (primeiro passo)
 - [ ] Confirmar `claude` autenticado, de novo
 - [ ] Notificações e atualizações do sistema desligadas
 - [ ] Slide 1 na tela, plateia entrando
@@ -115,7 +115,7 @@ startup entende o argumento: *agente rápido sem spec não acelera o projeto, ac
 
 ---
 
-### 09:50 — As evidências *(slides 14–17, 12 min)*
+### 09:50 — As evidências *(slides 14–18, 12 min)*
 
 **Slide 14 — o disclaimer.** Trinta segundos, sem pressa e sem piada. Nomes fictícios, dados
 sintéticos, documentos escritos para o exercício. Fecha com a frase que emenda no caso:
@@ -127,14 +127,22 @@ der, os slides bastam.
 No slide 16, aponte as datas: **o documento mais confiante é o mais antigo.**
 No slide 17, a pergunta: *"reconheceu o seu banco?"*
 
+**Slide 18 — para reproduzir em casa.** Um minuto, não mais. Quem quiser acompanhar tem a demo
+inteira para instalar. A frase que importa não é a lista:
+
+> "Ou não instale nada na mão. Cola o runbook no seu agente e deixa ele montar o ambiente —
+> que é, aliás, exatamente o que a gente vai fazer com o resto do projeto nas próximas duas horas."
+
+Emenda direto na DEMO 1.
+
 ---
 
-### 10:02 — DEMO 1 *(slides 18–23, 28 min)*
+### 10:02 — DEMO 1 *(slides 19–24, 28 min)*
 
-**Slide 18 · passo 01 — `S`.** Enquanto roda, narre o que o agente está fazendo. Não fique em
+**Slide 19 · passo 01 — `S`.** Enquanto roda, narre o que o agente está fazendo. Não fique em
 silêncio olhando o painel.
 
-**Slide 19 — PARE.** Este é o momento da oficina. Não corra.
+**Slide 20 — PARE.** Este é o momento da oficina. Não corra.
 
 1. Leia a tabela das quatro fontes, uma por uma, em voz alta
 2. Rode a query ao vivo, num terminal ao lado
@@ -143,43 +151,61 @@ silêncio olhando o painel.
 > "A ata errou. O requisito errou. E o dicionário do fornecedor — que é o documento mais
 > formal dos três — também errou. Só o dado estava certo."
 
-**Slide 20 — Dona Terezinha.** Aqui o número vira gente. Vá devagar.
+**Slide 21 — Dona Terezinha.** Aqui o número vira gente. Vá devagar.
 
 > "São sete pessoas. E nenhuma das cinco evidências menciona que elas existem."
 
-**Slide 21 — as outras personas.** Mais rápido, é reforço.
+**Slide 22 — as outras personas.** Mais rápido, é reforço.
 
-**Slide 22 · passo 02 — `S`.** O agente propõe e **pergunta** sobre a identificação.
+**Slide 23 · passo 02 — `S`.** O agente propõe e **pergunta** sobre a identificação.
 Se ele perguntar, comemore: é exatamente o comportamento que a oficina defende.
 
 *(Se o passo 03 couber antes de 10:30, rode. Se não, ele abre o bloco depois do intervalo.)*
 
 ---
 
-### 10:30 — Intervalo *(slide 24, 15 min)*
+### 10:30 — Intervalo *(slide 25, 15 min)*
 
 Deixe o slide na tela. Aproveite para conferir que o contêiner segue de pé.
 
 ---
 
-### 10:45 — DEMO 2 *(slides 25–26, 30 min)*
+### 10:45 — DEMO 2 *(slides 26–27, 30 min)*
 
-**Slide 25 — fachada, não repositório.** Trinta segundos de conceito antes de rodar.
+**Slide 26 — fachada, não repositório.** Trinta segundos de conceito antes de rodar.
 A frase: *migração costuma ser a resposta cara para a pergunta errada.*
 
-**Slide 26 · passo 04 — `S`.** O passo mais longo da sessão. Enquanto roda:
+**Slide 27 · passo 04.** ⚠️ **Leia isto antes do dia.**
+
+O ensaio mediu: **este passo leva 35 minutos ao vivo** — 105 chamadas de ferramenta para construir
+a fachada inteira. O bloco tem 30. **Ao vivo ele não cabe**, e assistir 35 minutos de saída de
+agente é ruim de plateia mesmo quando cabe.
+
+**Modo recomendado: REPLAY.** Aperte `R` e depois `S`. A gravação reproduz os 35 minutos em cerca
+de dois, e sobram vinte e cinco para o que vale mais — abrir o que foi construído e explicar.
+Enquanto roda:
 
 - aponte os arquivos aparecendo na árvore lateral
 - comente que os testes nascem junto com o código, não depois
-- se passar de quatro minutos, `Esc` `R` `S` sem hesitar
+
+Terminado o replay, use o tempo que sobrou para abrir de verdade:
+
+- `PatientMapper.java` — cada decisão da spec virou um método, com a evidência no comentário
+- `PacienteRepository.java` — o `nm_mae` que não é sequer selecionado
+- os testes — um por scenario
+
+**Se quiser mesmo ao vivo**, há um jeito: o runner é independente da navegação. Por volta de
+**10:28, antes do intervalo**, pule para este slide, aperte `S`, e volte para o slide do intervalo.
+O agente roda durante os 15 minutos de pausa e, às 10:45, você volta com a fachada pronta e
+percorre o resultado. Custa a cena dos arquivos nascendo, mas o build é genuinamente ao vivo.
 
 ---
 
-### 11:15 — DEMO 3 *(slides 27–28, 20 min)*
+### 11:15 — DEMO 3 *(slides 28–29, 20 min)*
 
-**Slide 27 · passo 05 — `S`.** O build fechando verde. Mostre a cobertura e a validação.
+**Slide 28 · passo 05 — `S`.** O build fechando verde. Mostre a cobertura e a validação.
 
-**Slide 28 — o bug do fuso.** Guarde este para o fim do bloco. É um achado real, encontrado
+**Slide 29 — o bug do fuso.** Guarde este para o fim do bloco. É um achado real, encontrado
 durante a construção deste material, e a plateia sente isso.
 
 > "O banco tinha dia 4. A API devolvia dia 3. Data de calendário não tem fuso —
@@ -188,20 +214,20 @@ durante a construção deste material, e a plateia sente isso.
 
 ---
 
-### 11:35 — Fechamento *(slides 29–33, 25 min)*
+### 11:35 — Fechamento *(slides 30–34, 25 min)*
 
-**Slide 29 · passo 06 — `S`.** O documento para o fornecedor.
+**Slide 30 · passo 06 — `S`.** O documento para o fornecedor.
 
-**Slide 30 · passo 07 — `S`.** `/opsx:archive`. A pergunta que fecha o argumento:
+**Slide 31 · passo 07 — `S`.** `/opsx:archive`. A pergunta que fecha o argumento:
 *daqui a dois anos, onde alguém encontra por que `I` virou `unknown`?*
 
-**Slide 31 — o que fazer na segunda.** Leia os cinco itens devagar. É o que eles levam.
+**Slide 32 — o que fazer na segunda.** Leia os cinco itens devagar. É o que eles levam.
 
-**Slide 32 — Dona Terezinha de novo.** O fecho emocional. Deixe respirar.
+**Slide 33 — Dona Terezinha de novo.** O fecho emocional. Deixe respirar.
 
 > "Interoperabilidade não é sobre sistemas. O padrão é o meio. A pessoa é o ponto."
 
-**Slide 33 — obrigado, repositório, contato.** Q&A até 12h.
+**Slide 34 — obrigado, repositório, contato.** Q&A até 12h.
 
 ---
 
@@ -212,6 +238,7 @@ durante a construção deste material, e a plateia sente isso.
 | `S` falha com `Failed to authenticate` | Sessão do Claude Code expirou. Rode `claude` num terminal, autentique, tente de novo. Se estiver no palco, vá de REPLAY. |
 | O runner avisa que a instalação do Claude Code está incompleta | Auto-atualização interrompida deixou só `claude.exe.old.*` no diretório `bin`. Conserto: `npm install -g @anthropic-ai/claude-code@latest`. No palco, vá de REPLAY. |
 | Passo travado ou lento demais | `Esc`, `R`, `S`. Sem explicar, sem pedir desculpa. |
+| Passo 04 ao vivo passando do tempo | Era esperado: ele leva 35 min. `Esc`, `R`, `S` e siga em REPLAY. |
 | Sem gravação para o passo | O painel diz qual comando rodar. No palco, pule para o slide seguinte e siga. |
 | Runner não sobe: porta em uso | Ele mesmo sugere `--port 4174`. Abra a nova porta no navegador. |
 | Contêiner caiu | `docker compose -f legacy-db/docker-compose.yml up -d`. Leva segundos. |
@@ -246,6 +273,23 @@ git checkout main -- openspec fhir-facade
 | Testes | 78 |
 | Cobertura | 97,2% |
 | Pacientes com erro de conformidade | 0 |
+
+### Duração real de cada passo
+
+Medido no ensaio completo de 24/08. Serve para decidir o que roda ao vivo e o que vai de REPLAY.
+
+| Passo | Ao vivo | Ferramentas |
+|---|---|---|
+| 01 Ler as evidências | 4,6 min | 23 |
+| 02 Propor a mudança | 1,2 min | 4 |
+| 03 Decidir a identificação | 7,5 min | 13 |
+| **04 Implementar a fachada** | **34,9 min** | **105** |
+| 05 Verificar e fechar o verde | 5,8 min | 15 |
+| 06 Documentar para o fornecedor | 7,3 min | 14 |
+| 07 Arquivar | 2,1 min | 11 |
+| **Total** | **64 min** | **185** |
+
+Uma rodada completa ao vivo custa cerca de **US$ 33** em tokens.
 
 ### Certificação FHIR na América Latina
 

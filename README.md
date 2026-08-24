@@ -48,6 +48,11 @@ O ponto de chegada é uma fachada FHIR R4 servindo `Patient` sobre esse banco, s
 - Docker e Docker Compose
 - Java 25 e Maven 3.9+
 - Node.js 20+
+- [Claude Code](https://claude.com/claude-code) autenticado e [OpenSpec](https://github.com/Fission-AI/OpenSpec)
+
+> **Não quer instalar na mão?** [`docs/runbook-ambiente.md`](docs/runbook-ambiente.md) tem um
+> prompt para colar no seu agente: ele diagnostica a máquina, instala o que dá, e é honesto
+> sobre o que só você pode fazer.
 
 ### Banco legado
 
