@@ -11,7 +11,7 @@
 // Sem dependencia externa: HTTP e fs.watch nativos.
 
 import { createServer } from 'node:http';
-import { spawn } from 'node:child_process';
+import { spawn, execFileSync } from 'node:child_process';
 import { createWriteStream, readFileSync, existsSync, mkdirSync, writeFileSync, unlinkSync, renameSync, statSync, readdirSync, watch } from 'node:fs';
 import { resolve, dirname, join, relative, extname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -224,6 +224,29 @@ ${step.prompt}`
   running = { id: step.id, kill: () => proc.kill() };
 }
 
+/**
+ * Traz para o disco os artefatos que o passo teria produzido.
+ *
+ * O REPLAY reproduz o stream, nao executa nada — nenhum arquivo nasce. Sem isso,
+ * replicar o passo 04 deixaria o projeto vazio e o passo 05, que roda mvn verify
+ * de verdade, nao teria o que verificar. O watcher mostra os arquivos chegando,
+ * entao o efeito na tela e o mesmo da execucao ao vivo.
+ */
+function materializar(step) {
+  if (!step.materializa?.length) return;
+  const ref = STEPS.referenciaMaterializacao ?? 'main';
+  try {
+    execFileSync('git', ['checkout', ref, '--', ...step.materializa], { cwd: ROOT });
+    scheduleTree();
+    console.log(`  materializado de ${ref}: ${step.materializa.join(', ')}`);
+  } catch (e) {
+    broadcast('falha', {
+      id: step.id,
+      message: `nao foi possivel materializar ${step.materializa.join(', ')} a partir de ${ref}: ${e.message}`,
+    });
+  }
+}
+
 function runReplay(step, speed = 6) {
   const file = gravacaoDe(step.id);
   if (!temGravacao(step.id)) {
@@ -242,6 +265,7 @@ function runReplay(step, speed = 6) {
     if (stopped) return;
     if (i >= lines.length) {
       running = null;
+      materializar(step);
       broadcast('step-end', { id: step.id, code: 0 });
       return;
     }

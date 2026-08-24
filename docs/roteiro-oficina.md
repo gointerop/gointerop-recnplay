@@ -188,6 +188,11 @@ Enquanto roda:
 - aponte os arquivos aparecendo na árvore lateral
 - comente que os testes nascem junto com o código, não depois
 
+O REPLAY reproduz o stream, mas não executa nada — nenhum arquivo nasceria. Por isso, ao terminar,
+o runner **materializa** `openspec/` e `fhir-facade/` a partir da `main`, e você vê os arquivos
+chegarem na árvore lateral. É o que faz o passo 05 seguinte, que roda `mvn verify` de verdade,
+ter o que verificar. Testado de ponta a ponta: palco vazio, replay, build verde.
+
 Terminado o replay, use o tempo que sobrou para abrir de verdade:
 
 - `PatientMapper.java` — cada decisão da spec virou um método, com a evidência no comentário
