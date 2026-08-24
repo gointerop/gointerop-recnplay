@@ -1,0 +1,26 @@
+cd_paciente;nm_paciente;nm_social;dt_nascimento;tp_sexo;nr_cpf;nr_cns;nm_mae;st_ativo;dt_obito;dt_atualizacao
+10001;Luciana Almeida Nascimento;;1940-08-04;F;26716608044;205795840320002;Cristiane Araújo Araújo;S;;2022-12-13 15:25:00
+10002;Pedro Carvalho Nunes;;2000-07-23;M;68794691320;114876294510006;Adriana Pereira Alves;S;;2026-05-08 15:34:00
+10003;José Fernandes Lima;;1950-04-06;M;98732028709;159342760220005;Jéssica Duarte Andrade;S;;2026-12-12 17:05:00
+10004;Felipe Barbosa Ferreira;;2016-04-20;M;;190777220470008;Sandra Carvalho Rodrigues;S;;2023-01-13 13:04:00
+10005;Débora Duarte Marques;;1994-03-11;F;;218331783860009;Sandra Dias Andrade;S;;2024-03-14 13:09:00
+10006;José Silva Andrade;;1949-10-09;M;06314758343;159221900690009;Gabriela Souza Tavares;S;;2026-04-07 07:31:00
+10007;Jéssica Gomes Lopes;;1966-06-14;F;12629769526;199026394810008;Débora Marques Almeida;S;;2026-08-01 12:59:00
+10008;Cícero Moreira Cavalcanti;;1991-03-06;M;11207052906;126855452200005;Juliana Vieira Vieira;S;;2022-05-25 18:03:00
+10009;Severino Cavalcanti Lopes;;1980-03-18;M;55197301805;148932056440000;Juliana Soares Fernandes;S;;2026-07-28 15:56:00
+10010;Antônio Rocha Moreira;;1990-03-26;M;;137983556030001;Aline Andrade Almeida;S;;2026-08-08 08:05:00
+10011;Anderson Silva Rocha;Juliana Silva Rocha;1989-09-14;M;32612087087;218620781540003;Aline Tavares Pereira;S;;2022-04-15 15:34:00
+10012;Thiago Soares Barbosa;;1937-09-21;M;;115216132000006;Simone Cavalcanti Cavalcanti;N;;2022-06-25 15:55:00
+10013;Rodrigo Moreira Barbosa;;2024-12-03;M;47035025936;143965131170003;Sandra Marques Fernandes;S;;2025-07-14 19:06:00
+10014;Ricardo Nunes Santos;;1969-08-21;M;43001074329;;Gabriela Tavares Oliveira;S;;2024-07-06 15:55:00
+10015;Rita Ribeiro Oliveira;;2024-12-09;F;57042666577;234443365150009;Patrícia Correia Fernandes;S;;2023-06-05 16:44:00
+10016;Márcia Rocha Silva;;1951-08-16;F;62946462943;203209123710018;Márcia Lopes Alves;S;;2025-03-10 20:26:00
+10017;Sandra Soares Correia;;2017-10-27;F;15990760124;100816966650004;Maria Alves Dias;S;;2026-11-01 07:58:00
+10018;Luciana Araújo Alves;;1989-04-21;F;;118287285320002;Gabriela Vieira Nascimento;S;;2026-06-23 10:51:00
+10019;Anderson Bezerra Nascimento;;1969-02-12;M;47808256285;256669495630005;Patrícia Nascimento Marques;S;;2022-05-06 11:48:00
+10020;Márcia Santos Marques;;1952-07-22;F;44327500224;250074351070004;Mariana Araújo Fernandes;S;;2026-06-22 12:45:00
+10021;Paulo Tavares Lima;;1982-06-28;M;21334041989;219816636080007;Sandra Silva Oliveira;S;;2026-04-23 08:28:00
+10022;Eduardo Soares Marques;;1985-08-09;M;63956918649;110346199120001;Jéssica Ferreira Araújo;S;;2026-04-17 19:08:00
+10023;Paulo Silva Ribeiro;;1947-07-28;M;;;Márcia Pereira Andrade;S;;2023-05-09 10:10:00
+10024;João Ribeiro Fernandes;;1959-12-16;M;;125658285030004;Amanda Lopes Lopes;S;;2024-11-15 10:53:00
+10025;Bruna Nascimento Correia;;1937-01-16;F;;161910058560009;Maria Barbosa Barbosa;S;;2022-10-25 14:38:00

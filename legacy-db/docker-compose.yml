@@ -1,0 +1,28 @@
+name: sigh-legacy
+
+services:
+  sigh-db:
+    image: postgres:17-alpine
+    container_name: sigh-db
+    environment:
+      POSTGRES_DB: sigh
+      POSTGRES_USER: sigh_app
+      POSTGRES_PASSWORD: sigh_app
+      # Banco legado do fornecedor Medsys roda com locale pt_BR.
+      LANG: pt_BR.UTF-8
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    ports:
+      - "55432:5432"
+    volumes:
+      # Migrations sao aplicadas na primeira inicializacao, em ordem alfabetica.
+      - ./migrations:/docker-entrypoint-initdb.d:ro
+      - sigh-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sigh_app -d sigh"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+volumes:
+  sigh-data:
