@@ -1,0 +1,55 @@
+{
+  "sessionId": "9e1c7a40-5b3d-4f28-9a61-2c8e4d0b7f13",
+  "projeto": "Fachada FHIR R4 de Patient sobre o SIGH",
+  "steps": [
+    {
+      "id": "01",
+      "slide": "demo-1a",
+      "title": "Ler as evidências",
+      "bloco": "DEMO 1",
+      "prompt": "Vamos expor o cadastro de pacientes do sistema legado SIGH como uma API FHIR R4, somente leitura, sem migrar nenhum dado.\n\nAntes de propor qualquer coisa, leia TODAS as evidências em `evidencias/` e o schema em `legacy-db/migrations/V1__schema.sql`. Ignore o diretório `docs/`.\n\nO banco de homologação está no ar e você pode consultá-lo:\n\n    docker exec sigh-db psql -U sigh_app -d sigh -c \"<SQL>\"\n\nSua tarefa nesta etapa é apenas de levantamento. Não escreva código, não crie change do OpenSpec, não escreva arquivo nenhum.\n\nO que eu quero de você:\n\n1. Para cada afirmação relevante sobre **identificação do paciente**, diga qual fonte afirma o quê.\n2. Confronte essas afirmações com o dado real, rodando as consultas que forem necessárias.\n3. Liste as divergências que encontrou, com números concretos.\n4. Diga quais decisões precisam ser tomadas por um humano antes de existir código.\n\nSeja direto e não suavize o que encontrar."
+    },
+    {
+      "id": "02",
+      "slide": "demo-1b",
+      "title": "Propor a mudança",
+      "bloco": "DEMO 1",
+      "prompt": "/opsx:propose fachada-fhir-paciente\n\nCrie a proposta da fachada FHIR R4 de `Patient` sobre o banco SIGH, usando exatamente o que você levantou nas evidências.\n\nRestrições que vêm das evidências e não são negociáveis:\n\n- Somente leitura. Nenhuma escrita no SIGH, por nenhum caminho.\n- Nenhuma alteração de schema, índice, trigger ou view no banco do fornecedor.\n- Nenhuma cópia persistente do cadastro. A consulta é ao vivo contra a origem.\n- Acesso apenas com privilégio de SELECT no schema `sigh`.\n- FHIR R4. Apenas o recurso `Patient` nesta entrega.\n- Nome social tem precedência de exibição, e o nome civil continua disponível.\n- Nome da mãe não entra no retorno padrão (restrição do DPO, PD-03).\n- CPF não pode aparecer em URL nem em log.\n- Cobertura de testes de no mínimo 90%.\n- Os recursos precisam passar em validação de conformidade.\n\nRegistre nas specs **todas** as divergências que você encontrou entre as fontes, junto com a decisão tomada e a justificativa. Uma divergência que você resolveu sozinho e não escreveu é um bug esperando para acontecer.\n\nSe alguma ambiguidade for material o bastante para mudar escopo ou comportamento observável, pergunte antes de decidir."
+    },
+    {
+      "id": "03",
+      "slide": "demo-1c",
+      "title": "Decidir a identificação",
+      "bloco": "DEMO 1",
+      "prompt": "Decisões tomadas, registre-as nas specs com a justificativa:\n\n1. **Identificador lógico do recurso** é `paciente.cd_paciente`. É a única coluna presente em 100% dos registros. CPF e CNS entram como identificadores de negócio em `Patient.identifier`, ambos opcionais.\n2. **Paciente sem CPF e sem CNS existe** e precisa ser retornável. Não é erro, não é exceção, é 3,5% da base.\n3. **`tp_sexo = 'I'`** mapeia para `unknown`, não para `other`. Justificativa: `other` afirma que a pessoa não é masculino nem feminino, e nós não sabemos isso. A origem do valor é a migração de 2013 e ninguém no fornecedor sabe dizer o que significa. `unknown` é a única leitura honesta.\n4. **`st_ativo` e `dt_obito` são independentes.** `st_ativo='N'` vira `Patient.active=false`. `dt_obito` vira `Patient.deceasedDateTime`. Nunca colapse os dois.\n5. **Busca incremental** usa `COALESCE(dt_atualizacao, dt_cadastro)`. Registre como risco conhecido que 7% dos registros dependem desse fallback e que a sincronização precisa de varredura completa periódica.\n6. **Nome da mãe** não entra no retorno. Nem opcional, nem por parâmetro. Fica registrado como fora de escopo por decisão do DPO.\n\nAgora complete todos os artefatos da change: proposal, specs, design e tasks."
+    },
+    {
+      "id": "04",
+      "slide": "demo-2a",
+      "title": "Implementar a fachada",
+      "bloco": "DEMO 2",
+      "prompt": "/opsx:apply fachada-fhir-paciente\n\nImplemente em `fhir-facade/`, seguindo as tasks.\n\nStack já validada nesta máquina, use exatamente estas versões:\n\n- Java 25, Maven, parent `spring-boot-starter-parent` 4.1.1\n- HAPI FHIR 8.10.1: `hapi-fhir-structures-r4`, `hapi-fhir-server`, `hapi-fhir-server-openapi`, `hapi-fhir-validation`, `hapi-fhir-validation-resources-r4`\n- Driver PostgreSQL 42.7.13, acesso por `spring-boot-starter-jdbc` com `JdbcTemplate`\n- Testcontainers 1.21.4 para os testes de integração\n- JaCoCo 0.8.15 com regra de cobertura mínima de 90% que **quebra o build** se não atingir\n\nPadrão obrigatório: **Plain Server / Facade** do HAPI. Um `IResourceProvider` de `Patient` que lê do Postgres e monta o recurso em memória. Nada de JPA server, nada de persistir FHIR.\n\nRegistre o `OpenApiInterceptor` para servir `/swagger-ui/`.\n\nBanco de homologação local:\n\n    jdbc:postgresql://localhost:55432/sigh   usuário integracao_ro / integracao_ro\n\nOperações de busca desta entrega: por `_id`, por `identifier`, por `name`, por `birthdate` e por `_lastUpdated`.\n\nEscreva os testes junto com o código, não depois. Cada scenario da spec vira um teste."
+    },
+    {
+      "id": "05",
+      "slide": "demo-3a",
+      "title": "Verificar e fechar o verde",
+      "bloco": "DEMO 3",
+      "prompt": "Rode `mvn -B verify` em `fhir-facade/` e resolva o que estiver vermelho até o build passar inteiro, com a regra de cobertura de 90% ativa.\n\nDepois disso, prove que funciona de verdade:\n\n1. Suba a aplicação e busque um paciente que você sabe que tem nome social. Mostre o JSON e confirme que `name[use=usual]` traz o nome social e `name[use=official]` traz o civil.\n2. Busque um dos pacientes sem CPF e sem CNS. Confirme que o recurso volta, válido, com `identifier` vazio.\n3. Valide os recursos retornados contra o FHIR R4 com o validador do HAPI e mostre que não há issue de severidade `error`.\n4. Confirme que `/metadata` responde com o `CapabilityStatement` e que `/swagger-ui/` carrega.\n5. Mostre o número final de cobertura do JaCoCo.\n\nSe algum desses pontos falhar, conserte antes de responder."
+    },
+    {
+      "id": "06",
+      "slide": "demo-3b",
+      "title": "Documentar para o fornecedor",
+      "bloco": "DEMO 3",
+      "prompt": "Gere `fhir-facade/DOCUMENTO-INTEGRACAO.md`, escrito para ser apresentado à Medsys e à TI do Hospital Santa Aurora.\n\nO leitor é técnico mas não conhece FHIR. Ele conhece o SIGH.\n\nConteúdo:\n\n1. O que foi construído e o que explicitamente não foi.\n2. Como a fachada acessa o banco, com quais privilégios, e a garantia de que não escreve.\n3. **Tabela de-para completa**, coluna do SIGH → elemento FHIR, com a regra de conversão de cada uma.\n4. As divergências encontradas entre a documentação do fornecedor e o dado real, com os números. Escreva isso sem acusar ninguém: é levantamento, não auditoria.\n5. As decisões tomadas e a justificativa de cada uma.\n6. Os riscos que sobraram, principalmente a sincronização incremental e a ausência de constraints no banco.\n7. O que a Medsys precisaria mudar no SIGH para eliminar cada risco.\n\nSeja factual e curto. Ninguém lê documento de integração de trinta páginas."
+    },
+    {
+      "id": "07",
+      "slide": "demo-3c",
+      "title": "Arquivar: spec vira documentação viva",
+      "bloco": "DEMO 3",
+      "prompt": "/opsx:archive fachada-fhir-paciente\n\nArquive a change e mostre o que ficou nas specs permanentes.\n\nDepois me diga, em poucas linhas: se amanhã entrar uma pessoa nova no time e ela precisar entender por que `tp_sexo = 'I'` virou `unknown`, onde exatamente ela encontra essa resposta?"
+    }
+  ]
+}
