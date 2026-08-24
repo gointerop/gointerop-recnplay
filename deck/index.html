@@ -1,0 +1,472 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Descomplicando o FHIR — GOInterop</title>
+<link rel="stylesheet" href="deck.css">
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="gi" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0b3fcc"/>
+      <stop offset="1" stop-color="#0a1f5c"/>
+    </linearGradient>
+    <symbol id="logo-gointerop" viewBox="0 0 1000 1000">
+      <circle cx="150" cy="150" r="150" fill="url(#gi)"/>
+      <circle cx="555" cy="545" r="405" fill="url(#gi)"/>
+      <circle cx="890" cy="880" r="110" fill="#0b3fcc"/>
+      <text x="555" y="580" text-anchor="middle" fill="#3fc8ff"
+            font-family="system-ui, Segoe UI, Roboto, sans-serif"
+            font-size="150" font-weight="800" letter-spacing="-4">GOInterop</text>
+    </symbol>
+  </defs>
+</svg>
+
+<div id="palco">
+  <main id="slides">
+
+    <!-- ================================================= ABERTURA == -->
+
+    <section class="slide capa" data-bloco="Abertura" data-hora="09:00">
+      <svg class="logo"><use href="#logo-gointerop"/></svg>
+      <h1>Descomplicando o FHIR</h1>
+      <p class="grande">Interoperabilidade prática para sistemas de saúde</p>
+      <div class="fila" style="justify-content:center">
+        <svg class="pessoa"><use href="#pessoa-terezinha"/></svg>
+        <svg class="pessoa"><use href="#pessoa-sergio"/></svg>
+        <svg class="pessoa"><use href="#pessoa-judite"/></svg>
+        <svg class="pessoa"><use href="#pessoa-antonio"/></svg>
+        <svg class="pessoa"><use href="#pessoa-solange"/></svg>
+        <svg class="pessoa"><use href="#pessoa-mariaclara"/></svg>
+        <svg class="pessoa"><use href="#pessoa-nilton"/></svg>
+      </div>
+      <p>REC'n'Play Capítulo Saúde · 28 de agosto de 2026 · NERD, Porto Digital</p>
+    </section>
+
+    <section class="slide" data-bloco="Abertura" data-hora="09:02">
+      <span class="tag">Quem conduz</span>
+      <h2>GOInterop</h2>
+      <p class="grande">Onde padrão encontra prática.</p>
+      <div class="cards">
+        <div class="card"><div class="rotulo">Padrão central</div><div class="valor">FHIR R4</div><div class="nota">Empresa brasileira FHIR-first, afiliada ao HL7 International</div></div>
+        <div class="card"><div class="rotulo">Conectores</div><div class="valor">50+</div><div class="nota">HL7 v2/v3, DICOM, REST, SOAP</div></div>
+        <div class="card"><div class="rotulo">Certificação</div><div class="valor">HL7</div><div class="nota">Especialistas certificados pela HL7 International e SBIS</div></div>
+        <div class="card"><div class="rotulo">Terminologias</div><div class="valor">BR</div><div class="nota">TUSS, CID-10, LOINC, RNDS</div></div>
+      </div>
+    </section>
+
+    <section class="slide" data-bloco="Abertura" data-hora="09:05">
+      <span class="tag">O combinado</span>
+      <h2>Três horas. Do zero ao funcionando.</h2>
+      <p class="grande">Isto não é uma palestra sobre integração. É uma integração, construída na sua frente.</p>
+      <ul>
+        <li><strong>Specs</strong> revisáveis, geradas a partir das evidências</li>
+        <li><strong>Mapeamento</strong> legado → FHIR, com as decisões registradas</li>
+        <li><strong>Fachada FHIR R4</strong> servindo <code>Patient</code> sobre um Postgres legado</li>
+        <li><strong>Swagger</strong>, <strong>testes acima de 90%</strong> e <strong>validação de conformidade</strong></li>
+        <li><strong>Documento</strong> pronto para entregar ao fornecedor</li>
+      </ul>
+      <p>Tudo o que aparecer na tela está no repositório ao fim da sessão.</p>
+      <div class="apoio"><svg class="pessoa"><use href="#pessoa-nilton"/></svg></div>
+    </section>
+
+    <!-- ============================== POR QUE INTEGRAÇÃO FALHA == -->
+
+    <section class="slide" data-bloco="Por que falha" data-hora="09:10">
+      <span class="tag">O problema</span>
+      <h2>Duas integrações morreram.<br>As duas no mesmo lugar.</h2>
+      <p class="grande">Não foi no FHIR. Não foi no protocolo. Foi em <em>entender o cadastro</em>.</p>
+      <p>Pegava-se a documentação do fornecedor, montava-se o de-para numa planilha, e quando rodava com dado de verdade não batia. Voltava, refazia, não batia de novo. Na terceira vez a diretoria cancelou o projeto.</p>
+      <div class="apoio"><svg class="pessoa"><use href="#pessoa-wellington"/></svg></div>
+    </section>
+
+    <section class="slide" data-bloco="Por que falha" data-hora="09:15">
+      <span class="tag">A raiz</span>
+      <h2>O conhecimento existe.<br>Só não está no mesmo lugar.</h2>
+      <div class="cards">
+        <div class="card"><div class="rotulo">Ata de reunião</div><div class="nota">Alguém afirma, com convicção, o que acredita ser verdade</div></div>
+        <div class="card"><div class="rotulo">Documento de requisitos</div><div class="nota">Transforma a convicção em requisito</div></div>
+        <div class="card"><div class="rotulo">Manual do fornecedor</div><div class="nota">Descreve o sistema de três versões atrás</div></div>
+        <div class="card"><div class="rotulo">DDL</div><div class="nota">Diz o que o banco de fato aceita</div></div>
+        <div class="card destaque"><div class="rotulo">O dado</div><div class="nota">É o único que não mente</div></div>
+      </div>
+      <p class="grande">Ninguém lê os cinco juntos. E quando lê, descobre que discordam.</p>
+    </section>
+
+    <section class="slide" data-bloco="Por que falha" data-hora="09:22">
+      <span class="tag">O custo</span>
+      <h2>A divergência sempre aparece.<br>Você escolhe quando.</h2>
+      <div class="duas">
+        <div>
+          <h3>Antes do código</h3>
+          <p>É uma pergunta numa reunião.</p>
+          <p class="grande">Custa dez minutos.</p>
+        </div>
+        <div>
+          <h3>Depois do código</h3>
+          <p>É um paciente com o prontuário de outro.</p>
+          <p class="grande">Custa um incidente grave — e às vezes o projeto inteiro.</p>
+        </div>
+      </div>
+      <div class="apoio"><svg class="pessoa"><use href="#pessoa-solange"/></svg></div>
+    </section>
+
+    <!-- ================================= SPEC ENGINEERING == -->
+
+    <section class="slide" data-bloco="Spec Engineering" data-hora="09:30">
+      <span class="tag">A prática</span>
+      <h2>Spec Engineering</h2>
+      <p class="grande">Transformar evidências dispersas numa especificação revisável — e só então em código.</p>
+      <p class="grande"><em>A spec não é documentação do que foi feito. É onde a divergência aparece antes de virar código.</em></p>
+    </section>
+
+    <section class="slide" data-bloco="Spec Engineering" data-hora="09:36">
+      <span class="tag">Distinção importante</span>
+      <h2>Não é "vibe coding"</h2>
+      <table>
+        <tr><th></th><th>Prompt direto</th><th>Spec Engineering</th></tr>
+        <tr><td><strong>Entrada</strong></td><td>o que você lembra</td><td>as evidências, todas</td></tr>
+        <tr><td><strong>Ambiguidade</strong></td><td>o agente escolhe calado</td><td>vira pergunta ou decisão registrada</td></tr>
+        <tr><td><strong>Revisão</strong></td><td>ler o código gerado</td><td>ler a spec, antes do código existir</td></tr>
+        <tr><td><strong>Rastreio</strong></td><td>"por que está assim?"</td><td>requisito → evidência → teste</td></tr>
+        <tr><td><strong>Quando muda</strong></td><td>reescreve e torce</td><td>muda a spec, o resto segue</td></tr>
+      </table>
+      <p>Agente rápido sem spec não acelera o projeto. Acelera o retrabalho.</p>
+    </section>
+
+    <section class="slide" data-bloco="Spec Engineering" data-hora="09:42">
+      <span class="tag">A unidade de trabalho</span>
+      <h2>Requirement e Scenario</h2>
+      <p>Uma spec é um contrato de comportamento. Cada cenário é um teste esperando para nascer.</p>
+      <pre>### Requirement: Paciente sem identificador de negócio
+
+O sistema SHALL retornar normalmente pacientes que não
+possuam CPF nem CNS.
+
+A ausência de identificador MUST NOT ser tratada como erro.
+São 3,5% da base.
+
+#### Scenario: Paciente sem CPF e sem CNS
+- **WHEN** um consumidor solicita um paciente cujo registro
+  tem `nr_cpf` e `nr_cns` nulos
+- **THEN** o sistema retorna `200 OK` com um `Patient` válido
+- **AND** o recurso não possui o elemento `identifier`</pre>
+    </section>
+
+    <section class="slide" data-bloco="Spec Engineering" data-hora="09:46">
+      <span class="tag">O ciclo</span>
+      <h2>propose → apply → archive</h2>
+      <div class="cards">
+        <div class="card"><div class="rotulo">/opsx:propose</div><div class="nota">Lê as evidências e produz proposal, specs, design e tasks. <strong>Para antes de implementar.</strong> Diante de ambiguidade material, pergunta em vez de escolher.</div></div>
+        <div class="card"><div class="rotulo">/opsx:apply</div><div class="nota">Implementa seguindo as tasks. Cada scenario da spec vira um teste.</div></div>
+        <div class="card"><div class="rotulo">/opsx:archive</div><div class="nota">A change vira spec permanente. A decisão de hoje continua localizável daqui a dois anos.</div></div>
+      </div>
+      <p class="grande">A fronteira entre planejar e implementar passa a ser do método — não da sua disciplina às onze da noite.</p>
+    </section>
+
+    <!-- ======================================= AS EVIDÊNCIAS == -->
+
+    <section class="slide" data-bloco="As evidências" data-hora="09:50">
+      <span class="tag">O caso</span>
+      <h2>VitaFlow × Hospital Santa Aurora</h2>
+      <p class="grande">Uma healthtech precisa ler o cadastro de pacientes de um hospital que roda o <strong>SIGH</strong>, do fornecedor <strong>Medsys</strong>.</p>
+      <p>O fornecedor não fala FHIR. Entrega um Postgres e um manual de API de 2021 — para um sistema que está na versão 4.2.1.</p>
+      <p class="mono" style="color:var(--dim)">Caso ficcional, dados sintéticos. As imperfeições do cadastro são reais.</p>
+      <div class="apoio"><svg class="pessoa"><use href="#pessoa-wellington"/></svg></div>
+    </section>
+
+    <section class="slide" data-bloco="As evidências" data-hora="09:54">
+      <span class="tag">O ponto de partida</span>
+      <h2>Cinco evidências e um banco</h2>
+      <table>
+        <tr><th>Arquivo</th><th>O que é</th><th>Data</th></tr>
+        <tr><td class="mono">01-ata-kickoff</td><td>Transcrição da reunião de kickoff</td><td>14/07/2026</td></tr>
+        <tr><td class="mono">02-requisitos</td><td>Documento de requisitos do produto</td><td>21/07/2026</td></tr>
+        <tr><td class="mono">03-arquitetura</td><td>Ambiente atual do hospital</td><td>19/07/2026</td></tr>
+        <tr><td class="mono">04-api-fornecedor</td><td>Manual de integração da Medsys</td><td>11/2021</td></tr>
+        <tr><td class="mono">05-banco</td><td>Dicionário de dados e amostra</td><td>03/2019</td></tr>
+        <tr class="verdade"><td class="mono">legacy-db/</td><td>O banco de verdade, rodando agora</td><td>hoje</td></tr>
+      </table>
+      <p>Repare nas datas. O documento mais confiante é o mais antigo.</p>
+    </section>
+
+    <section class="slide" data-bloco="As evidências" data-hora="09:58">
+      <span class="tag">O banco legado</span>
+      <h2>Sem FK, sem máscara, sem garantia</h2>
+      <pre>CREATE TABLE sigh.paciente (
+    cd_paciente     INTEGER      NOT NULL,
+    nm_paciente     VARCHAR(120) NOT NULL,
+    nm_social       VARCHAR(120),
+    dt_nascimento   DATE,
+    tp_sexo         CHAR(1),      -- domínio SEXO
+    nr_cpf          VARCHAR(11),  -- &lt;-- aceita nulo
+    nr_cns          VARCHAR(15),
+    nm_mae          VARCHAR(120),
+    st_ativo        CHAR(1) DEFAULT 'S',
+    dt_obito        DATE,
+    dt_cadastro     TIMESTAMP,
+    dt_atualizacao  TIMESTAMP
+);
+-- Constraints de integridade referencial removidas em 2021
+-- por questão de performance na carga de faturamento.</pre>
+      <p>Reconheceu o seu banco? Pois é.</p>
+    </section>
+
+    <!-- ============================================== DEMO 1 == -->
+
+    <section class="slide" data-bloco="DEMO 1" data-hora="10:02" data-step="01">
+      <span class="tag">Demo 1 · passo 1</span>
+      <h2>Ler tudo.<br>Conferir com o dado.</h2>
+      <p>O agente lê as cinco evidências e o DDL, e tem acesso ao banco. A tarefa <em>não</em> é escrever código — é levantar o que cada fonte afirma e checar.</p>
+      <p class="mono" style="color:var(--dim)">S dispara · R alterna LIVE e REPLAY</p>
+    </section>
+
+    <section class="slide" data-bloco="DEMO 1" data-hora="10:14">
+      <span class="tag">Pare a demo aqui</span>
+      <h2>Quatro fontes.<br>Uma verdade.</h2>
+      <table>
+        <tr><th>Fonte</th><th>O que afirma sobre CPF</th></tr>
+        <tr><td>Ata, 14:08:15 — a gerente de produto</td><td>"Todo paciente tem CPF cadastrado"</td></tr>
+        <tr><td>Requisitos VF-412, P-01 e RF-02</td><td>CPF é a chave de identificação</td></tr>
+        <tr><td>Dicionário do fornecedor MS-DIC-011</td><td><code>nr_cpf</code> — Obrigatório: <strong>Sim</strong></td></tr>
+        <tr><td>DDL entregue pela Medsys</td><td><code>VARCHAR(11)</code> — aceita nulo</td></tr>
+        <tr class="verdade"><td>O dado</td><td>31 de 200 sem CPF — <strong>15,5%</strong></td></tr>
+      </table>
+      <pre>docker exec sigh-db psql -U sigh_app -d sigh -c \
+  "SELECT count(*) FILTER (WHERE nr_cpf IS NULL) AS sem_cpf,
+          count(*) FILTER (WHERE nr_cpf IS NULL
+                             AND nr_cns IS NULL) AS sem_nenhum
+     FROM sigh.paciente;"</pre>
+    </section>
+
+    <section class="slide" data-bloco="DEMO 1" data-hora="10:18">
+      <span class="tag">Os 3,5% têm nome</span>
+      <h2>Dona Terezinha existe.<br>Para a integração, não.</h2>
+      <div class="personas">
+        <div class="persona critica">
+          <svg class="pessoa"><use href="#pessoa-terezinha"/></svg>
+          <div>
+            <div class="quem">Terezinha, 78 anos</div>
+            <div class="fala">Cadastrada em 2011, na migração do sistema antigo. Nunca teve CPF no cadastro. Nunca teve CNS. Faz hemodiálise três vezes por semana há nove anos.</div>
+            <div class="achado">Se a chave for o CPF, ela não existe — ou pior, é agrupada com os outros seis sob um nulo comum.</div>
+          </div>
+        </div>
+      </div>
+      <p class="grande">Sete pacientes na base não têm nenhum identificador de negócio. <em>Nenhuma das cinco evidências menciona esse caso.</em></p>
+    </section>
+
+    <section class="slide" data-bloco="DEMO 1" data-hora="10:21">
+      <span class="tag">E não para por aí</span>
+      <h2>Cada número é uma pessoa</h2>
+      <div class="personas duplo">
+        <div class="persona">
+          <svg class="pessoa"><use href="#pessoa-mariaclara"/></svg>
+          <div>
+            <div class="quem">Maria Clara, 6 dias</div>
+            <div class="fala">Registrada com <code>tp_sexo = 'I'</code> na maternidade.</div>
+            <div class="achado">3% da base. Valor fora do domínio documentado.</div>
+          </div>
+        </div>
+        <div class="persona">
+          <svg class="pessoa"><use href="#pessoa-antonio"/></svg>
+          <div>
+            <div class="quem">Seu Antônio, 61 anos</div>
+            <div class="fala">A recepção busca "antonio", sem acento, e não encontra.</div>
+            <div class="achado">Busca sensível a acentuação perde o paciente.</div>
+          </div>
+        </div>
+        <div class="persona">
+          <svg class="pessoa"><use href="#pessoa-sergio"/></svg>
+          <div>
+            <div class="quem">Sérgio, 34 anos</div>
+            <div class="fala">Nome social no cadastro desde 2019. A API do fornecedor nunca expôs o campo.</div>
+            <div class="achado">Decreto 8.727/2016. Já houve reclamação na ouvidoria.</div>
+          </div>
+        </div>
+        <div class="persona">
+          <svg class="pessoa"><use href="#pessoa-judite"/></svg>
+          <div>
+            <div class="quem">Dona Judite, agente comunitária</div>
+            <div class="fala">Atualiza cadastros por um processo batch que escreve direto no banco.</div>
+            <div class="achado">7% sem <code>dt_atualizacao</code>. Invisíveis à sincronização.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="slide" data-bloco="DEMO 1" data-hora="10:24" data-step="02">
+      <span class="tag">Demo 1 · passo 2</span>
+      <h2>Propor a mudança</h2>
+      <p>Agora sim. O agente gera proposal, specs, design e tasks — e <strong>para antes de implementar</strong>.</p>
+      <p class="grande">Repare no que ele faz com a divergência do CPF. Ele não escolhe: ele pergunta.</p>
+    </section>
+
+    <section class="slide" data-bloco="DEMO 1" data-hora="10:27" data-step="03">
+      <span class="tag">Demo 1 · passo 3</span>
+      <h2>A decisão é humana.<br>O registro é obrigatório.</h2>
+      <p class="grande"><code>cd_paciente</code> é o identificador lógico. CPF e CNS viram identificadores de negócio — <em>opcionais</em>.</p>
+      <p>Seis decisões entram na spec, cada uma com a justificativa e a evidência que a originou. Daqui a dois anos, alguém vai precisar delas.</p>
+    </section>
+
+    <!-- ========================================== INTERVALO == -->
+
+    <section class="slide capa" data-bloco="Intervalo" data-hora="10:30">
+      <svg class="logo"><use href="#logo-gointerop"/></svg>
+      <h1>Intervalo</h1>
+      <p class="grande">15 minutos</p>
+      <p>Voltamos às 10h45 para construir a fachada.</p>
+    </section>
+
+    <!-- ============================================== DEMO 2 == -->
+
+    <section class="slide" data-bloco="DEMO 2" data-hora="10:45">
+      <span class="tag">Antes de implementar</span>
+      <h2>Fachada, não repositório</h2>
+      <div class="duas">
+        <div>
+          <h3>JPA Server</h3>
+          <p>Um repositório FHIR completo, com persistência própria. Exigiria copiar o cadastro para dentro dele.</p>
+          <p><strong>Descartado.</strong> Levar prontuário para fora do hospital é exatamente o que a arquitetura proíbe.</p>
+        </div>
+        <div>
+          <h3>Plain Server</h3>
+          <p>Um <code>IResourceProvider</code> sobre a origem que já existe. O recurso é montado em memória a cada requisição.</p>
+          <p><strong>Escolhido.</strong> A fachada é um tradutor. Nenhum dado sai do lugar.</p>
+        </div>
+      </div>
+      <p class="grande">Quase sempre dá para traduzir sem copiar. Migração costuma ser a resposta cara para a pergunta errada.</p>
+    </section>
+
+    <section class="slide" data-bloco="DEMO 2" data-hora="10:50" data-step="04">
+      <span class="tag">Demo 2 · passo 4</span>
+      <h2>Implementar seguindo as tasks</h2>
+      <p>Cada scenario da spec vira um teste. Acompanhe os arquivos nascendo no painel ao lado.</p>
+      <p class="mono" style="color:var(--dim)">Java 25 · Spring Boot 4.1.1 · HAPI FHIR 8.10.1 · Testcontainers · JaCoCo</p>
+    </section>
+
+    <!-- ============================================== DEMO 3 == -->
+
+    <section class="slide" data-bloco="DEMO 3" data-hora="11:15" data-step="05">
+      <span class="tag">Demo 3 · passo 5</span>
+      <h2>Fechar o verde</h2>
+      <ul>
+        <li>Sérgio: <code>name[use=usual]</code> traz o nome social, <code>official</code> traz o civil</li>
+        <li>Dona Terezinha: recurso válido, <code>identifier</code> ausente, sem erro</li>
+        <li>Validação de conformidade contra o FHIR R4, nos 200 pacientes</li>
+        <li><code>/metadata</code> e <code>/swagger-ui/</code> no ar</li>
+        <li>Cobertura acima de 90%, com o build quebrando abaixo disso</li>
+      </ul>
+    </section>
+
+    <section class="slide" data-bloco="DEMO 3" data-hora="11:24">
+      <span class="tag">Achado durante os testes</span>
+      <h2>A data de nascimento<br>andava um dia.</h2>
+      <p class="grande">O banco tinha <code>1940-08-04</code>. A API devolvia <code>1940-08-03</code>.</p>
+      <pre>// A data virava instante à meia-noite de America/Recife...
+patient.setBirthDate(Date.from(
+    data.atStartOfDay(ZoneId.of("America/Recife")).toInstant()));
+
+// ...e o HAPI a serializava de volta no fuso da JVM.
+// A máquina estava em America/Cayenne — UTC-4 até 1967.</pre>
+      <p class="grande"><em>Data de calendário não tem fuso.</em> Converter para instante e voltar é o bug.</p>
+      <p>Em pareamento de paciente, um dia de diferença é identidade trocada. O teste de regressão está fixado no repositório.</p>
+    </section>
+
+    <!-- ======================================== FECHAMENTO == -->
+
+    <section class="slide" data-bloco="Fechamento" data-hora="11:35" data-step="06">
+      <span class="tag">Fechamento · passo 6</span>
+      <h2>O documento que o fornecedor lê</h2>
+      <p>De-para completo, divergências com números, decisões com justificativa, riscos que sobraram — e o que a Medsys precisaria mudar para eliminar cada um.</p>
+      <p class="grande">Escrito a partir da spec, não da memória de quem implementou.</p>
+      <div class="apoio"><svg class="pessoa"><use href="#pessoa-wellington"/></svg></div>
+    </section>
+
+    <section class="slide" data-bloco="Fechamento" data-hora="11:42" data-step="07">
+      <span class="tag">Fechamento · passo 7</span>
+      <h2>A spec vira documentação viva</h2>
+      <p class="grande">Daqui a dois anos alguém vai perguntar por que <code>tp_sexo = 'I'</code> virou <code>unknown</code> e não <code>other</code>.</p>
+      <p>A resposta não está na planilha, nem na memória de quem já saiu da empresa. Está no requisito — com a evidência que a originou e o teste que a garante.</p>
+    </section>
+
+    <section class="slide" data-bloco="Fechamento" data-hora="11:48">
+      <span class="tag">Para levar</span>
+      <h2>O que fazer na segunda-feira</h2>
+      <ul>
+        <li><strong>Junte as evidências antes de abrir o editor.</strong> Ata, requisito, manual, DDL — e o dado.</li>
+        <li><strong>Rode a query.</strong> A afirmação mais confiante do projeto costuma ser a mais errada.</li>
+        <li><strong>Escreva a divergência, não só a decisão.</strong> Quem vier depois precisa saber o que foi descartado, e por quê.</li>
+        <li><strong>Deixe o agente perguntar.</strong> Ambiguidade resolvida em silêncio vira bug com paciente no meio.</li>
+        <li><strong>Fachada antes de migração.</strong> Quase sempre dá para traduzir sem copiar.</li>
+      </ul>
+      <div class="apoio"><svg class="pessoa"><use href="#pessoa-judite"/></svg></div>
+    </section>
+
+    <section class="slide" data-bloco="Fechamento" data-hora="11:53">
+      <span class="tag">No fim</span>
+      <h2>Interoperabilidade não é<br>sobre sistemas.</h2>
+      <div class="personas">
+        <div class="persona">
+          <svg class="pessoa"><use href="#pessoa-terezinha"/></svg>
+          <div>
+            <div class="quem">É sobre a Dona Terezinha</div>
+            <div class="fala">chegar na hemodiálise e o sistema saber quem ela é — mesmo sem CPF, mesmo cadastrada há quinze anos, mesmo com o nome escrito de três jeitos diferentes em três sistemas.</div>
+          </div>
+        </div>
+      </div>
+      <p class="grande">O padrão é o meio. A pessoa é o ponto.</p>
+    </section>
+
+    <section class="slide capa" data-bloco="Fechamento" data-hora="11:56">
+      <svg class="logo"><use href="#logo-gointerop"/></svg>
+      <h1>Obrigado</h1>
+      <p class="grande">Onde padrão encontra prática.</p>
+      <p class="mono">github.com/gointerop/gointerop-recnplay</p>
+      <p>gointerop.com · contato@gointerop.com<br>FHIR R4 · HL7 · LOINC · TUSS · CID-10 · RNDS</p>
+    </section>
+
+  </main>
+
+  <aside id="painel">
+    <div class="painel-topo">
+      <svg class="logo-rodape"><use href="#logo-gointerop"/></svg>
+      <span class="titulo" id="painel-titulo">—</span>
+      <span class="pill" id="painel-modo">LIVE</span>
+      <span class="pill rodando" id="painel-estado" hidden>rodando</span>
+      <span class="cronometro" id="painel-cronometro">0:00</span>
+    </div>
+    <div class="painel-corpo">
+      <div id="fluxo"></div>
+      <div id="arquivos"><div class="vazio">os arquivos aparecem aqui conforme nascem</div></div>
+    </div>
+  </aside>
+</div>
+
+<div id="rodape">
+  <span class="bloco" id="rodape-bloco"></span>
+  <span class="horario" id="rodape-hora"></span>
+  <span class="contador"><span id="rodape-n">1</span> / <span id="rodape-total">1</span> · <kbd>?</kbd> ajuda</span>
+</div>
+<div id="progresso"></div>
+
+<div id="ajuda">
+  <div class="painel-ajuda">
+    <h3>Comandos</h3>
+    <dl>
+      <dt>→ · Espaço</dt><dd>próximo slide</dd>
+      <dt>←</dt><dd>slide anterior</dd>
+      <dt>S</dt><dd>disparar o passo deste slide</dd>
+      <dt>R</dt><dd>alternar entre LIVE e REPLAY</dd>
+      <dt>Esc</dt><dd>abortar o passo em execução</dd>
+      <dt>L</dt><dd>limpar o painel</dd>
+      <dt>?</dt><dd>abrir e fechar esta ajuda</dd>
+    </dl>
+  </div>
+</div>
+
+<script src="deck.js"></script>
+</body>
+</html>

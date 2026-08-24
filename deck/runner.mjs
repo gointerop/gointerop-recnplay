@@ -12,7 +12,7 @@
 
 import { createServer } from 'node:http';
 import { spawn } from 'node:child_process';
-import { createWriteStream, readFileSync, existsSync, mkdirSync, writeFileSync, unlinkSync, statSync, readdirSync, watch } from 'node:fs';
+import { createWriteStream, readFileSync, existsSync, mkdirSync, writeFileSync, unlinkSync, renameSync, statSync, readdirSync, watch } from 'node:fs';
 import { resolve, dirname, join, relative, extname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -104,6 +104,19 @@ function stepById(id) {
   return STEPS.steps.find((s) => s.id === id);
 }
 
+/** Caminho da gravacao de um passo. */
+const gravacaoDe = (id) => resolve(REC_DIR, `step-${id}.jsonl`);
+
+/**
+ * Uma gravacao so vale se tiver conteudo. Um arquivo vazio sobra de execucao
+ * interrompida e, se contasse como gravacao, o REPLAY terminaria em silencio no
+ * meio da oficina.
+ */
+function temGravacao(id) {
+  const f = gravacaoDe(id);
+  return existsSync(f) && statSync(f).size > 0;
+}
+
 function runLive(step) {
   const first = !existsSync(STATE);
   const session = first ? STEPS.sessionId : readFileSync(STATE, 'utf8').trim();
@@ -118,7 +131,12 @@ function runLive(step) {
     ...(first ? ['--session-id', session] : ['--resume', session]),
   ];
 
-  const rec = createWriteStream(resolve(REC_DIR, `step-${step.id}.jsonl`));
+  // A gravacao vai primeiro para um arquivo temporario e so substitui a gravacao
+  // boa se a execucao terminar bem. Sem isso, uma tentativa LIVE que falha no
+  // palco — autenticacao expirada, rede caida — apagaria justamente o REPLAY que
+  // serviria de rede de seguranca para aquele passo.
+  const parcial = gravacaoDe(step.id) + '.parcial';
+  const rec = createWriteStream(parcial);
   const proc = spawn('claude', argv, { cwd: ROOT, shell: process.platform === 'win32' });
   proc.stdin.write(step.prompt);
   proc.stdin.end();
@@ -139,8 +157,14 @@ function runLive(step) {
   proc.stderr.on('data', (c) => broadcast('stderr', { text: c.toString('utf8') }));
 
   proc.on('close', (code) => {
-    rec.end();
-    if (first) writeFileSync(STATE, session, 'utf8');
+    rec.end(() => {
+      if (code === 0 && statSync(parcial).size > 0) {
+        renameSync(parcial, gravacaoDe(step.id));
+      } else {
+        try { unlinkSync(parcial); } catch { /* ja removido */ }
+      }
+    });
+    if (first && code === 0) writeFileSync(STATE, session, 'utf8');
     running = null;
     broadcast('step-end', { id: step.id, code });
   });
@@ -149,9 +173,12 @@ function runLive(step) {
 }
 
 function runReplay(step, speed = 6) {
-  const file = resolve(REC_DIR, `step-${step.id}.jsonl`);
-  if (!existsSync(file)) {
-    broadcast('error', { id: step.id, message: `sem gravacao para o passo ${step.id}` });
+  const file = gravacaoDe(step.id);
+  if (!temGravacao(step.id)) {
+    broadcast('falha', {
+      id: step.id,
+      message: `sem gravação para o passo ${step.id} — rode: node tools/run-step.mjs ${step.id}`,
+    });
     return;
   }
   const lines = readFileSync(file, 'utf8').split('\n').filter((l) => l.trim());
@@ -188,7 +215,7 @@ const json = (res, code, body) => {
   res.end(JSON.stringify(body));
 };
 
-createServer((req, res) => {
+function atender(req, res) {
   const url = new URL(req.url, `http://localhost:${PORT}`);
   const p = url.pathname;
 
@@ -214,7 +241,7 @@ createServer((req, res) => {
       steps: STEPS.steps.map((s) => ({
         id: s.id, slide: s.slide, title: s.title, bloco: s.bloco,
         prompt: s.prompt,
-        gravado: existsSync(resolve(REC_DIR, `step-${s.id}.jsonl`)),
+        gravado: temGravacao(s.id),
       })),
       running: running?.id ?? null,
     });
@@ -267,7 +294,24 @@ createServer((req, res) => {
   }
   res.writeHead(200, { 'content-type': MIME[extname(file)] ?? 'application/octet-stream' });
   res.end(readFileSync(file));
-}).listen(PORT, () => {
+}
+
+const servidor = createServer(atender);
+
+// Porta ocupada e o erro mais provavel na hora da montagem: quase sempre e um
+// runner esquecido de um ensaio anterior. Com a sala cheia, uma mensagem clara
+// vale mais do que um stack trace.
+servidor.on('error', (e) => {
+  if (e.code === 'EADDRINUSE') {
+    console.error(`\n  A porta ${PORT} ja esta em uso.`);
+    console.error('  Provavelmente ha outro runner rodando. Encerre-o, ou use:');
+    console.error(`      node deck/runner.mjs --port ${PORT + 1}\n`);
+    process.exit(1);
+  }
+  throw e;
+});
+
+servidor.listen(PORT, () => {
   console.log(`\n  deck   http://localhost:${PORT}`);
   console.log(`  passos ${STEPS.steps.length}   sessao ${STEPS.sessionId}`);
   console.log(`  observando ${WATCHED.join(', ')}\n`);
