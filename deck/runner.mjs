@@ -15,6 +15,7 @@ import { spawn } from 'node:child_process';
 import { createWriteStream, readFileSync, existsSync, mkdirSync, writeFileSync, unlinkSync, renameSync, statSync, readdirSync, watch } from 'node:fs';
 import { resolve, dirname, join, relative, extname, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { resolverClaude, versaoDoClaude } from '../tools/claude-bin.mjs';
 
 const DECK = dirname(fileURLToPath(import.meta.url));
 const ROOT = resolve(DECK, '..');
@@ -29,6 +30,16 @@ const PORT = portArg > -1 ? Number(process.argv[portArg + 1]) : 4173;
 const WATCHED = ['openspec', 'fhir-facade'];
 
 mkdirSync(REC_DIR, { recursive: true });
+
+// Resolvido na subida, e nao no primeiro disparo: melhor descobrir que o
+// Claude Code esta quebrado durante a montagem do que com a sala cheia.
+let CLAUDE = null;
+let CLAUDE_ERRO = null;
+try {
+  CLAUDE = resolverClaude();
+} catch (e) {
+  CLAUDE_ERRO = e.message;
+}
 
 // ---------------------------------------------------------------- SSE --------
 const clients = new Set();
@@ -131,13 +142,19 @@ function runLive(step) {
     ...(first ? ['--session-id', session] : ['--resume', session]),
   ];
 
+  if (!CLAUDE) {
+    broadcast('falha', { id: step.id, message: CLAUDE_ERRO });
+    broadcast('step-end', { id: step.id, code: 1 });
+    return;
+  }
+
   // A gravacao vai primeiro para um arquivo temporario e so substitui a gravacao
   // boa se a execucao terminar bem. Sem isso, uma tentativa LIVE que falha no
   // palco — autenticacao expirada, rede caida — apagaria justamente o REPLAY que
   // serviria de rede de seguranca para aquele passo.
   const parcial = gravacaoDe(step.id) + '.parcial';
   const rec = createWriteStream(parcial);
-  const proc = spawn('claude', argv, { cwd: ROOT, shell: process.platform === 'win32' });
+  const proc = spawn(CLAUDE.comando, argv, { cwd: ROOT, shell: CLAUDE.shell });
   proc.stdin.write(step.prompt);
   proc.stdin.end();
 
@@ -314,5 +331,14 @@ servidor.on('error', (e) => {
 servidor.listen(PORT, () => {
   console.log(`\n  deck   http://localhost:${PORT}`);
   console.log(`  passos ${STEPS.steps.length}   sessao ${STEPS.sessionId}`);
-  console.log(`  observando ${WATCHED.join(', ')}\n`);
+  console.log(`  observando ${WATCHED.join(', ')}`);
+
+  if (CLAUDE) {
+    const v = versaoDoClaude(CLAUDE.comando);
+    console.log(`  claude ${v ?? '(nao respondeu — verifique a autenticacao)'}  [${CLAUDE.origem}]\n`);
+  } else {
+    console.log('\n  ATENCAO — o modo LIVE nao vai funcionar:\n');
+    console.log(CLAUDE_ERRO.split('\n').map((l) => '  ' + l).join('\n'));
+    console.log('  O modo REPLAY continua funcionando normalmente.\n');
+  }
 });

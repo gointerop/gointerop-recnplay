@@ -14,6 +14,10 @@ Faça na véspera, e refaça na manhã do dia. Leva dez minutos e cobre tudo o q
 - [ ] **Autenticar o Claude Code.** Abra `claude` no terminal e confirme que a sessão está válida.
       Sessão de OAuth expirada faz o `S` do deck falhar com `Failed to authenticate` — e é
       silenciosa até você tentar usar.
+- [ ] **Deixar a auto-atualização terminar.** O runner imprime a versão do `claude` ao subir.
+      Se ele avisar que a instalação está incompleta, rode
+      `npm install -g @anthropic-ai/claude-code@latest` e suba de novo. Uma atualização pega
+      pela metade some com o executável e o modo LIVE para.
 - [ ] `docker compose -f legacy-db/docker-compose.yml up -d` e confirmar 200 pacientes
 - [ ] `cd fhir-facade && mvn -B verify` — build verde de ponta a ponta
 - [ ] `node tools/run-step.mjs --list` — **todos os sete passos devem estar gravados**
@@ -181,6 +185,7 @@ durante a construção deste material, e a plateia sente isso.
 | Sintoma | O que fazer |
 |---|---|
 | `S` falha com `Failed to authenticate` | Sessão do Claude Code expirou. Rode `claude` num terminal, autentique, tente de novo. Se estiver no palco, vá de REPLAY. |
+| O runner avisa que a instalação do Claude Code está incompleta | Auto-atualização interrompida deixou só `claude.exe.old.*` no diretório `bin`. Conserto: `npm install -g @anthropic-ai/claude-code@latest`. No palco, vá de REPLAY. |
 | Passo travado ou lento demais | `Esc`, `R`, `S`. Sem explicar, sem pedir desculpa. |
 | Sem gravação para o passo | O painel diz qual comando rodar. No palco, pule para o slide seguinte e siga. |
 | Runner não sobe: porta em uso | Ele mesmo sugere `--port 4174`. Abra a nova porta no navegador. |

@@ -15,6 +15,7 @@ import { spawn } from 'node:child_process';
 import { createWriteStream, readFileSync, writeFileSync, existsSync, mkdirSync, unlinkSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { resolverClaude, versaoDoClaude } from './claude-bin.mjs';
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const STEPS_FILE = resolve(ROOT, 'deck/steps.json');
@@ -86,7 +87,7 @@ function runStep(step) {
     console.log(`\x1b[2m  ${first ? 'nova sessao' : 'retomando'} ${session}\x1b[0m`);
 
     const rec = createWriteStream(resolve(REC_DIR, `step-${step.id}.jsonl`));
-    const proc = spawn('claude', argv, { cwd: ROOT, shell: process.platform === 'win32' });
+    const proc = spawn(CLAUDE.comando, argv, { cwd: ROOT, shell: CLAUDE.shell });
     proc.stdin.write(step.prompt);
     proc.stdin.end();
 
@@ -112,6 +113,16 @@ function runStep(step) {
 }
 
 // --- Sequenciamento ----------------------------------------------------------
+let CLAUDE;
+try {
+  CLAUDE = resolverClaude();
+} catch (e) {
+  console.error('\n' + e.message);
+  process.exit(1);
+}
+const versao = versaoDoClaude(CLAUDE.comando);
+console.log(`claude ${versao ?? '(nao respondeu — verifique a autenticacao com: claude)'}  [${CLAUDE.origem}]`);
+
 const wanted = args.filter((a) => !a.startsWith('--'));
 for (const id of wanted) {
   const step = cfg.steps.find((s) => s.id === id);
