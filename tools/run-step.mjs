@@ -113,7 +113,16 @@ function runStep(step) {
     const parcial = gravacaoDe(step.id) + '.parcial';
     const rec = createWriteStream(parcial);
     const proc = spawn(CLAUDE.comando, argv, { cwd: ROOT, shell: CLAUDE.shell });
-    proc.stdin.write(step.prompt);
+    // A instrucao de idioma vai tambem no corpo do prompt, e nao so em
+    // --append-system-prompt: sozinha, a instrucao de sistema nao venceu o
+    // idioma do restante do prompt, e o agente respondia em ingles.
+    proc.stdin.write(cfg.instrucaoDeSistema
+      ? `${cfg.instrucaoDeSistema}
+
+---
+
+${step.prompt}`
+      : step.prompt);
     proc.stdin.end();
 
     let buf = '';
