@@ -111,6 +111,7 @@ function runStep(step) {
     // Grava em arquivo parcial e so promove se a execucao terminar bem — uma
     // tentativa que falha nao pode destruir a gravacao boa do passo.
     const parcial = gravacaoDe(step.id) + '.parcial';
+    mkdirSync(REC_DIR, { recursive: true });
     const rec = createWriteStream(parcial);
     const proc = spawn(CLAUDE.comando, argv, { cwd: ROOT, shell: CLAUDE.shell });
     // A instrucao de idioma vai tambem no corpo do prompt, e nao so em
@@ -140,10 +141,21 @@ ${step.prompt}`
 
     proc.on('close', (code) => {
       rec.end(() => {
-        if (code === 0 && statSync(parcial).size > 0) renameSync(parcial, gravacaoDe(step.id));
-        else { try { unlinkSync(parcial); } catch { /* ja removido */ } }
+        try {
+          if (code === 0 && statSync(parcial).size > 0) renameSync(parcial, gravacaoDe(step.id));
+          else unlinkSync(parcial);
+        } catch (e) {
+          console.error('  aviso: nao foi possivel salvar a gravacao —', e.message);
+        }
       });
-      if (first && code === 0) writeFileSync(STATE_FILE, session, 'utf8');
+      try {
+        if (first && code === 0) {
+          mkdirSync(REC_DIR, { recursive: true });
+          writeFileSync(STATE_FILE, session, 'utf8');
+        }
+      } catch (e) {
+        console.error('  aviso: nao foi possivel gravar a sessao —', e.message);
+      }
       code === 0 ? done() : fail(new Error(`passo ${step.id} saiu com codigo ${code}`));
     });
   });

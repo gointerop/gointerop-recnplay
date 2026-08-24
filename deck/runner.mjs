@@ -165,6 +165,10 @@ function runLive(step) {
   // palco — autenticacao expirada, rede caida — apagaria justamente o REPLAY que
   // serviria de rede de seguranca para aquele passo.
   const parcial = gravacaoDe(step.id) + '.parcial';
+  // O diretorio e garantido a cada passo, e nao so na subida: ele pode
+  // desaparecer no meio da sessao — uma troca de branch remove um diretorio que
+  // ficou sem arquivo rastreado.
+  mkdirSync(REC_DIR, { recursive: true });
   const rec = createWriteStream(parcial);
   const proc = spawn(CLAUDE.comando, argv, { cwd: ROOT, shell: CLAUDE.shell });
   // A instrucao de idioma vai tambem no corpo do prompt, e nao so em
@@ -195,14 +199,24 @@ ${step.prompt}`
   proc.stderr.on('data', (c) => broadcast('stderr', { text: c.toString('utf8') }));
 
   proc.on('close', (code) => {
+    // Nada aqui pode lancar: uma excecao neste callback derruba o servidor
+    // inteiro, e no palco isso significa perder o deck no meio da oficina.
     rec.end(() => {
-      if (code === 0 && statSync(parcial).size > 0) {
-        renameSync(parcial, gravacaoDe(step.id));
-      } else {
-        try { unlinkSync(parcial); } catch { /* ja removido */ }
+      try {
+        if (code === 0 && statSync(parcial).size > 0) renameSync(parcial, gravacaoDe(step.id));
+        else unlinkSync(parcial);
+      } catch (e) {
+        console.error('  aviso: nao foi possivel salvar a gravacao —', e.message);
       }
     });
-    if (first && code === 0) writeFileSync(STATE, session, 'utf8');
+    try {
+      if (first && code === 0) {
+        mkdirSync(REC_DIR, { recursive: true });
+        writeFileSync(STATE, session, 'utf8');
+      }
+    } catch (e) {
+      console.error('  aviso: nao foi possivel gravar a sessao —', e.message);
+    }
     running = null;
     broadcast('step-end', { id: step.id, code });
   });
