@@ -12,7 +12,8 @@
 // prompts slide a slide sem perder contexto.
 
 import { spawn } from 'node:child_process';
-import { createWriteStream, readFileSync, writeFileSync, existsSync, mkdirSync, unlinkSync } from 'node:fs';
+import { createWriteStream, readFileSync, writeFileSync, existsSync, mkdirSync, unlinkSync, renameSync, statSync } from 'node:fs';
+import { randomUUID } from 'node:crypto';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { resolverClaude, versaoDoClaude } from './claude-bin.mjs';
@@ -27,12 +28,32 @@ const args = process.argv.slice(2);
 
 mkdirSync(REC_DIR, { recursive: true });
 
+const gravacaoDe = (id) => resolve(REC_DIR, `step-${id}.jsonl`);
+
+/** Uma gravacao so conta quando tem conteudo. Arquivo vazio sobra de run interrompido. */
+function temGravacao(id) {
+  const f = gravacaoDe(id);
+  return existsSync(f) && statSync(f).size > 0;
+}
+
+/**
+ * Identificador da cadeia de passos.
+ *
+ * E gerado a cada nova cadeia, e nao fixado no steps.json: um id fixo so pode ser
+ * usado uma vez por maquina, e o Claude Code recusa a segunda tentativa com
+ * "Session ID already in use". Com id fixo, ensaiar duas vezes seria impossivel —
+ * e o dia da oficina colidiria com o ultimo ensaio.
+ */
+function sessaoAtual() {
+  if (existsSync(STATE_FILE)) return { id: readFileSync(STATE_FILE, 'utf8').trim(), nova: false };
+  return { id: randomUUID(), nova: true };
+}
+
 if (args.includes('--list') || args.length === 0) {
-  console.log(`\nsessao: ${cfg.sessionId}\n`);
-  for (const s of cfg.steps) {
-    const rec = resolve(REC_DIR, `step-${s.id}.jsonl`);
-    const mark = existsSync(rec) ? '●' : '○';
-    console.log(`  ${mark} ${s.id}  ${s.title}`);
+  const s = sessaoAtual();
+  console.log(`\nsessao: ${s.id}${s.nova ? '  (nova — nenhum passo executado ainda)' : ''}\n`);
+  for (const step of cfg.steps) {
+    console.log(`  ${temGravacao(step.id) ? '●' : '○'} ${step.id}  ${step.title}`);
   }
   console.log('\n  ● gravado   ○ pendente\n');
   process.exit(0);
@@ -40,7 +61,7 @@ if (args.includes('--list') || args.length === 0) {
 
 if (args.includes('--reset')) {
   if (existsSync(STATE_FILE)) unlinkSync(STATE_FILE);
-  console.log('sessao zerada — o proximo passo abre uma nova.');
+  console.log('sessao zerada — o proximo passo abre uma nova, com id novo.');
   process.exit(0);
 }
 
@@ -68,12 +89,10 @@ function render(ev) {
 // --- Execucao de um passo ----------------------------------------------------
 function runStep(step) {
   return new Promise((done, fail) => {
-    const first = !existsSync(STATE_FILE);
-    const session = first ? cfg.sessionId : readFileSync(STATE_FILE, 'utf8').trim();
+    const { id: session, nova: first } = sessaoAtual();
 
-    // O prompt vai por stdin, nunca por argv: no Windows o spawn precisa de
-    // shell:true para resolver o claude.cmd, e ai os argumentos sao apenas
-    // concatenados — um prompt multilinha com aspas seria destruido.
+    // O prompt vai por stdin, nunca por argv: um prompt multilinha com aspas
+    // seria destruido caso o spawn precisasse passar por um shell.
     const argv = [
       '-p',
       '--output-format', 'stream-json',
@@ -86,7 +105,10 @@ function runStep(step) {
     console.log(`\n\x1b[1m▌ passo ${step.id} — ${step.title}\x1b[0m`);
     console.log(`\x1b[2m  ${first ? 'nova sessao' : 'retomando'} ${session}\x1b[0m`);
 
-    const rec = createWriteStream(resolve(REC_DIR, `step-${step.id}.jsonl`));
+    // Grava em arquivo parcial e so promove se a execucao terminar bem — uma
+    // tentativa que falha nao pode destruir a gravacao boa do passo.
+    const parcial = gravacaoDe(step.id) + '.parcial';
+    const rec = createWriteStream(parcial);
     const proc = spawn(CLAUDE.comando, argv, { cwd: ROOT, shell: CLAUDE.shell });
     proc.stdin.write(step.prompt);
     proc.stdin.end();
@@ -105,8 +127,11 @@ function runStep(step) {
     proc.stderr.on('data', (c) => process.stderr.write(c));
 
     proc.on('close', (code) => {
-      rec.end();
-      if (first) writeFileSync(STATE_FILE, session, 'utf8');
+      rec.end(() => {
+        if (code === 0 && statSync(parcial).size > 0) renameSync(parcial, gravacaoDe(step.id));
+        else { try { unlinkSync(parcial); } catch { /* ja removido */ } }
+      });
+      if (first && code === 0) writeFileSync(STATE_FILE, session, 'utf8');
       code === 0 ? done() : fail(new Error(`passo ${step.id} saiu com codigo ${code}`));
     });
   });

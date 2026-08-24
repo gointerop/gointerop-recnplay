@@ -175,10 +175,23 @@ pre {
 
 /* ------------------------------------------------------------ logo -- */
 
-/* SVG inline sem viewBox proprio assume altura padrao de 150px e distorce.
-   aspect-ratio resolve sem precisar repetir o viewBox em cada elemento. */
-.logo { width: clamp(72px, 8vw, 128px); height: auto; aspect-ratio: 1; }
-.logo-rodape { width: 26px; height: 26px; opacity: .85; }
+/* A base do gradiente da logo fica em torno de #012569, que contra o fundo do
+   deck (#051435) da 1,27:1 — num projetor em sala clara a marca se dissolve por
+   baixo. O halo segue o canal alfa do PNG, entao contorna a silhueta real sem
+   alterar o arquivo da marca. */
+.logo {
+  width: clamp(72px, 8vw, 128px);
+  height: auto;
+  filter: drop-shadow(0 0 1px rgba(63, 200, 255, .45))
+          drop-shadow(0 6px 22px rgba(0, 104, 240, .30));
+}
+
+.logo-rodape {
+  width: 26px;
+  height: 26px;
+  opacity: .9;
+  filter: drop-shadow(0 0 1px rgba(63, 200, 255, .4));
+}
 
 /* ----------------------------------------------------------- painel -- */
 
