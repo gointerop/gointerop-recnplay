@@ -132,16 +132,35 @@ function ferramenta(nome, argumento) {
   anexar(el);
 }
 
+/** Diretorios de topo do projeto, usados para cortar o prefixo absoluto. */
+const RAIZES = ['fhir-facade', 'openspec', 'evidencias', 'legacy-db', 'deck', 'docs', 'tools'];
+
+/**
+ * Encurta caminhos para exibicao.
+ *
+ * Caminho absoluto e ruido no projetor, e a gravacao do ensaio carrega o
+ * diretorio onde ela foi feita — que nao e o da maquina do palco. Cortar no
+ * primeiro diretorio conhecido do projeto resolve os dois casos.
+ */
+function encurtarCaminhos(texto) {
+  return texto.replace(/[A-Za-z]:[\\/][^\s"']+|\/[^\s"']{12,}/g, (caminho) => {
+    const partes = caminho.split(/[\\/]/);
+    const raiz = partes.findIndex((p) => RAIZES.includes(p));
+    if (raiz >= 0) return partes.slice(raiz).join('/');
+    return partes.length > 3 ? '…/' + partes.slice(-2).join('/') : caminho;
+  });
+}
+
 /** Traduz um evento do stream-json do Claude Code para o painel. */
 function renderizarAgente(ev) {
   if (ev.type === 'assistant' && ev.message?.content) {
     for (const c of ev.message.content) {
       if (c.type === 'text' && c.text.trim()) {
-        linha('texto', c.text.trim());
+        linha('texto', encurtarCaminhos(c.text.trim()));
       } else if (c.type === 'tool_use') {
         const i = c.input ?? {};
         const detalhe = i.command ?? i.file_path ?? i.pattern ?? i.path ?? i.prompt ?? '';
-        ferramenta(c.name, String(detalhe).replace(/\s+/g, ' ').slice(0, 160));
+        ferramenta(c.name, encurtarCaminhos(String(detalhe).replace(/\s+/g, ' ')).slice(0, 160));
       }
     }
   } else if (ev.type === 'result') {
