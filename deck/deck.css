@@ -54,12 +54,17 @@ body::before {
 
 /* ----------------------------------------------------------- palco -- */
 
+/* Item de grid nasce com min-height:auto, que impede encolher abaixo do
+   conteudo. Sem os minmax e min-height:0 desta cadeia, o painel cresce ate a
+   altura do stream do agente, estoura a viewport e o conteudo fica inalcancavel:
+   #fluxo nunca chega a rolar porque scrollHeight e igual a clientHeight. */
 #palco {
   position: relative;
   z-index: 1;
   height: 100%;
   display: grid;
   grid-template-columns: 1fr;
+  grid-template-rows: minmax(0, 1fr);
   transition: grid-template-columns .35s ease;
 }
 
@@ -67,7 +72,7 @@ body::before {
 
 /* ---------------------------------------------------------- slides -- */
 
-#slides { position: relative; overflow: hidden; }
+#slides { position: relative; overflow: hidden; min-height: 0; }
 
 .slide {
   position: absolute;
@@ -201,6 +206,7 @@ pre {
   border-left: 1px solid var(--card-line);
   background: rgba(3, 17, 46, .55);
   min-width: 0;
+  min-height: 0;
 }
 
 #palco.com-painel #painel { display: flex; }
@@ -234,10 +240,12 @@ pre {
 .painel-topo .titulo { font-weight: 700; color: var(--white); }
 .painel-topo .cronometro { margin-left: auto; font-family: var(--mono); color: var(--dim); }
 
-.painel-corpo { flex: 1; display: grid; grid-template-rows: 1fr auto; min-height: 0; }
+.painel-corpo { flex: 1; display: grid; grid-template-rows: minmax(0, 1fr) auto; min-height: 0; }
 
 #fluxo {
+  min-height: 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: .9rem 1rem;
   font-family: var(--mono);
   font-size: .84em;

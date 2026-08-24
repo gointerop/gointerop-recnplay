@@ -100,12 +100,22 @@ function limpar() {
     { className: 'vazio', textContent: 'os arquivos aparecem aqui conforme nascem' }));
 }
 
+/**
+ * Acrescenta ao painel acompanhando o fim do stream — mas so enquanto o
+ * palestrante nao tiver rolado para tras. Quem sobe para reler algo nao pode ser
+ * puxado de volta a cada evento que chega.
+ */
+function anexar(el) {
+  const noFim = fluxo.scrollHeight - fluxo.scrollTop - fluxo.clientHeight < 60;
+  fluxo.append(el);
+  if (noFim) fluxo.scrollTop = fluxo.scrollHeight;
+}
+
 function linha(classe, texto) {
   const el = document.createElement('div');
   el.className = classe;
   el.textContent = texto;
-  fluxo.append(el);
-  fluxo.scrollTop = fluxo.scrollHeight;
+  anexar(el);
   return el;
 }
 
@@ -119,8 +129,7 @@ function ferramenta(nome, argumento) {
   a.className = 'arg';
   a.textContent = argumento;
   el.append(n, a);
-  fluxo.append(el);
-  fluxo.scrollTop = fluxo.scrollHeight;
+  anexar(el);
 }
 
 /** Traduz um evento do stream-json do Claude Code para o painel. */
@@ -193,6 +202,7 @@ function conectar() {
     inicio = Date.now();
     ui.estado.hidden = false;
     linha('aviso', `▌ passo ${d.id} — ${d.title}  [${d.mode.toUpperCase()}]`);
+    fluxo.scrollTop = fluxo.scrollHeight;
   });
 
   fonte.addEventListener('step-end', (e) => {
