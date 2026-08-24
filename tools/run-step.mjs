@@ -99,6 +99,9 @@ function runStep(step) {
       '--include-partial-messages',
       '--verbose',
       '--permission-mode', 'bypassPermissions',
+      // Prompt em portugues nao garante resposta em portugues, e o texto do
+      // agente vai projetado para a plateia.
+      ...(cfg.instrucaoDeSistema ? ['--append-system-prompt', cfg.instrucaoDeSistema] : []),
       ...(first ? ['--session-id', session] : ['--resume', session]),
     ];
 

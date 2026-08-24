@@ -21,3 +21,9 @@ Thumbs.db
 # Logs e temporarios
 *.log
 tmp/
+
+# Estado transitorio do runner da oficina.
+# As gravacoes (.jsonl) sao versionadas de proposito -- sao a rede de seguranca
+# do modo REPLAY. Ja o arquivo parcial e o id da sessao ativa, nao.
+deck/recordings/*.parcial
+deck/recordings/.session

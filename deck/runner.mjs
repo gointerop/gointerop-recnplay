@@ -148,6 +148,9 @@ function runLive(step) {
     '--include-partial-messages',
     '--verbose',
     '--permission-mode', 'bypassPermissions',
+    // Prompt em portugues nao garante resposta em portugues, e o texto do
+    // agente vai projetado para a plateia.
+    ...(STEPS.instrucaoDeSistema ? ['--append-system-prompt', STEPS.instrucaoDeSistema] : []),
     ...(first ? ['--session-id', session] : ['--resume', session]),
   ];
 
