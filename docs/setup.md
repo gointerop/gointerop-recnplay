@@ -104,6 +104,11 @@ Depois copie `deck/recordings/*.jsonl` de volta para o repositório e comite. Pa
 As gravações ficam em `deck/recordings/`. Uma execução que falha **não** sobrescreve uma
 gravação boa: ela escreve num arquivo parcial e só promove se terminar bem.
 
+**Quem grava é o `run-step.mjs`, não o deck.** Uma execução LIVE disparada pelo runner nunca
+substitui uma gravação existente — ali o LIVE é apresentação ou teste, e sobrescrever destruiria
+a rede de segurança. Para regravar de propósito, use o `run-step.mjs`, que sobrescreve por ser
+essa a sua função.
+
 ## Regerar os dados sintéticos
 
 A carga é determinística — a mesma seed produz sempre os mesmos 200 pacientes, com as mesmas
