@@ -94,7 +94,7 @@
       <p class="grande so-final">Sobraram dois em todo o continente. <em>Um dos dois está aqui — e é daqui.</em></p>
     </section>
 
-    <section class="slide" data-bloco="Abertura" data-hora="09:05">
+    <section class="slide" data-bloco="Abertura" data-hora="09:12">
       <span class="tag">O combinado</span>
       <h2>Três horas. Do zero ao funcionando.</h2>
       <p class="grande">Isto não é uma palestra sobre integração. É uma integração, construída na sua frente.</p>
@@ -111,7 +111,7 @@
 
     <!-- ============================== POR QUE INTEGRAÇÃO FALHA == -->
 
-    <section class="slide" data-bloco="Por que falha" data-hora="09:10">
+    <section class="slide" data-bloco="Por que falha" data-hora="09:14">
       <span class="tag">O problema</span>
       <h2>Duas integrações morreram.<br>As duas no mesmo lugar.</h2>
       <p class="grande">Não foi no FHIR. Não foi no protocolo. Foi em <em>entender o cadastro</em>.</p>
@@ -119,7 +119,7 @@
       <div class="apoio"><svg class="pessoa"><use href="#pessoa-wellington"/></svg></div>
     </section>
 
-    <section class="slide" data-bloco="Por que falha" data-hora="09:15">
+    <section class="slide" data-bloco="Por que falha" data-hora="09:19">
       <span class="tag">A raiz</span>
       <h2>O conhecimento existe.<br>Só não está no mesmo lugar.</h2>
       <div class="cards">
@@ -132,7 +132,7 @@
       <p class="grande">Ninguém lê os cinco juntos. E quando lê, descobre que discordam.</p>
     </section>
 
-    <section class="slide" data-bloco="Por que falha" data-hora="09:22">
+    <section class="slide" data-bloco="Por que falha" data-hora="09:25">
       <span class="tag">O custo</span>
       <h2>A divergência sempre aparece.<br>Você escolhe quando.</h2>
       <div class="duas">
@@ -201,6 +201,31 @@ São 3,5% da base.
         <div class="card"><div class="rotulo">/opsx:archive</div><div class="nota">A change vira spec permanente. A decisão de hoje continua localizável daqui a dois anos.</div></div>
       </div>
       <p class="grande">A fronteira entre planejar e implementar passa a ser do método — não da sua disciplina às onze da noite.</p>
+    </section>
+
+    <section class="slide" data-bloco="Spec Engineering" data-hora="09:48">
+      <span class="tag">Anatomia de uma change</span>
+      <h2>Quatro arquivos,<br>quatro perguntas</h2>
+      <div class="duas">
+        <pre>openspec/
+├─ changes/
+│  └─ fachada-fhir-paciente/
+│     ├─ proposal.md   ← por quê
+│     ├─ specs/
+│     │  └─ paciente-fhir/
+│     │     └─ spec.md ← o quê
+│     ├─ design.md     ← como
+│     └─ tasks.md      ← em que ordem
+│
+└─ specs/              ← o que já vale hoje</pre>
+        <div class="cards" style="grid-template-columns:1fr">
+          <div class="card"><div class="rotulo">Por quê</div><div class="nota"><code>proposal.md</code> — o problema, o que muda, o impacto. Uma página, não dez.</div></div>
+          <div class="card"><div class="rotulo">O quê</div><div class="nota"><code>spec.md</code> — requirements com scenarios. Contrato de comportamento, sem escolha de biblioteca nem nome de classe.</div></div>
+          <div class="card"><div class="rotulo">Como</div><div class="nota"><code>design.md</code> — as decisões técnicas, <em>com a alternativa que foi recusada e o porquê</em>. E os riscos assumidos.</div></div>
+          <div class="card"><div class="rotulo">Em que ordem</div><div class="nota"><code>tasks.md</code> — a lista que o <code>/opsx:apply</code> segue, e vai marcando.</div></div>
+        </div>
+      </div>
+      <p>Depois do <code>archive</code>, a change sai de <code>changes/</code> e vira spec permanente em <code>specs/</code>. O que era proposta passa a ser o que o sistema faz.</p>
     </section>
 
     <!-- ======================================= AS EVIDÊNCIAS == -->
