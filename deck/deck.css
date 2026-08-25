@@ -540,3 +540,17 @@ kbd {
 .degrau.fecho { border-left-color: transparent; margin-top: .3rem; }
 .degrau.fecho.atual { background: rgba(0, 104, 240, .16); border-left-color: var(--blue-500); }
 .degrau.fecho .problema { color: var(--cyan-400); }
+
+/* Icone do produto na escada. Mesma silhueta da marca com o simbolo vazado,
+   na linguagem do folder institucional. */
+.icone-produto {
+  width: clamp(26px, 2.4vw, 38px);
+  height: auto;
+  aspect-ratio: 1;
+  flex: none;
+  vertical-align: -.32em;
+  margin-right: .5rem;
+}
+
+.degrau .resposta { display: block; }
+.degrau.atual .icone-produto { filter: drop-shadow(0 0 6px rgba(63, 200, 255, .45)); }
