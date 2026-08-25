@@ -29,7 +29,7 @@ Faça na véspera, e refaça na manhã do dia. Leva dez minutos e cobre tudo o q
 
 - [ ] Docker aberto e contêiner de pé **60 minutos antes** — não deixe para 8h55
 - [ ] `node deck/runner.mjs` e abrir `http://localhost:4173`
-- [ ] Verificar que o painel lateral abre no slide 19 (primeiro passo)
+- [ ] Verificar que o painel lateral abre no slide 20 (primeiro passo)
 - [ ] Confirmar `claude` autenticado, de novo
 - [ ] Notificações e atualizações do sistema desligadas
 - [ ] Slide 1 na tela, plateia entrando
@@ -103,7 +103,7 @@ sabia quem mantinha?"* Espere as mãos.
 
 ---
 
-### 09:30 — Spec Engineering *(slides 10–13, 20 min)*
+### 09:30 — Spec Engineering *(slides 10–14, 20 min)*
 
 **Slide 10** — a definição. **Slide 11** — a tabela contra prompt direto. Aqui a plateia de
 startup entende o argumento: *agente rápido sem spec não acelera o projeto, acelera o retrabalho*.
@@ -113,21 +113,31 @@ startup entende o argumento: *agente rápido sem spec não acelera o projeto, ac
 **Slide 13** — o ciclo. Enfatize que `/opsx:propose` **para** antes de implementar. A fronteira
 é do método, não da disciplina de quem está cansado às onze da noite.
 
+**Slide 14 — anatomia de uma change.** O slide anterior nomeia os quatro arquivos; este diz o que
+cada um guarda. Passe pelas quatro perguntas — por quê, o quê, como, em que ordem — e pare no
+`design.md`:
+
+> "Repare que o design guarda a alternativa que foi **recusada**, e o porquê. É o que ninguém
+> escreve, e é justamente o que a próxima pessoa precisa saber."
+
+Vale porque, daqui a vinte minutos, esses arquivos vão aparecer nascendo no painel da DEMO 1 —
+e a plateia já vai saber o que está vendo.
+
 ---
 
-### 09:50 — As evidências *(slides 14–18, 12 min)*
+### 09:50 — As evidências *(slides 15–19, 12 min)*
 
-**Slide 14 — o disclaimer.** Trinta segundos, sem pressa e sem piada. Nomes fictícios, dados
+**Slide 15 — o disclaimer.** Trinta segundos, sem pressa e sem piada. Nomes fictícios, dados
 sintéticos, documentos escritos para o exercício. Fecha com a frase que emenda no caso:
 *os nomes são fictícios, os problemas não.*
 
-**Slides 15 a 17 — o caso.** Abra os arquivos de verdade em `evidencias/` se der tempo. Se não
+**Slides 16 a 18 — o caso.** Abra os arquivos de verdade em `evidencias/` se der tempo. Se não
 der, os slides bastam.
 
-No slide 16, aponte as datas: **o documento mais confiante é o mais antigo.**
-No slide 17, a pergunta: *"reconheceu o seu banco?"*
+No slide 17, aponte as datas: **o documento mais confiante é o mais antigo.**
+No slide 18, a pergunta: *"reconheceu o seu banco?"*
 
-**Slide 18 — para reproduzir em casa.** Um minuto, não mais. Quem quiser acompanhar tem a demo
+**Slide 19 — para reproduzir em casa.** Um minuto, não mais. Quem quiser acompanhar tem a demo
 inteira para instalar. A frase que importa não é a lista:
 
 > "Ou não instale nada na mão. Cola o runbook no seu agente e deixa ele montar o ambiente —
@@ -137,12 +147,12 @@ Emenda direto na DEMO 1.
 
 ---
 
-### 10:02 — DEMO 1 *(slides 19–24, 28 min)*
+### 10:02 — DEMO 1 *(slides 20–25, 28 min)*
 
-**Slide 19 · passo 01 — `S`.** Enquanto roda, narre o que o agente está fazendo. Não fique em
+**Slide 20 · passo 01 — `S`.** Enquanto roda, narre o que o agente está fazendo. Não fique em
 silêncio olhando o painel.
 
-**Slide 20 — PARE.** Este é o momento da oficina. Não corra.
+**Slide 21 — PARE.** Este é o momento da oficina. Não corra.
 
 1. Leia a tabela das quatro fontes, uma por uma, em voz alta
 2. Rode a query ao vivo, num terminal ao lado
@@ -151,31 +161,31 @@ silêncio olhando o painel.
 > "A ata errou. O requisito errou. E o dicionário do fornecedor — que é o documento mais
 > formal dos três — também errou. Só o dado estava certo."
 
-**Slide 21 — Dona Terezinha.** Aqui o número vira gente. Vá devagar.
+**Slide 22 — Dona Terezinha.** Aqui o número vira gente. Vá devagar.
 
 > "São sete pessoas. E nenhuma das cinco evidências menciona que elas existem."
 
-**Slide 22 — as outras personas.** Mais rápido, é reforço.
+**Slide 23 — as outras personas.** Mais rápido, é reforço.
 
-**Slide 23 · passo 02 — `S`.** O agente propõe e **pergunta** sobre a identificação.
+**Slide 24 · passo 02 — `S`.** O agente propõe e **pergunta** sobre a identificação.
 Se ele perguntar, comemore: é exatamente o comportamento que a oficina defende.
 
 *(Se o passo 03 couber antes de 10:30, rode. Se não, ele abre o bloco depois do intervalo.)*
 
 ---
 
-### 10:30 — Intervalo *(slide 25, 15 min)*
+### 10:30 — Intervalo *(slide 26, 15 min)*
 
 Deixe o slide na tela. Aproveite para conferir que o contêiner segue de pé.
 
 ---
 
-### 10:45 — DEMO 2 *(slides 26–27, 30 min)*
+### 10:45 — DEMO 2 *(slides 27–28, 30 min)*
 
-**Slide 26 — fachada, não repositório.** Trinta segundos de conceito antes de rodar.
+**Slide 27 — fachada, não repositório.** Trinta segundos de conceito antes de rodar.
 A frase: *migração costuma ser a resposta cara para a pergunta errada.*
 
-**Slide 27 · passo 04.** ⚠️ **Leia isto antes do dia.**
+**Slide 28 · passo 04.** ⚠️ **Leia isto antes do dia.**
 
 O ensaio mediu: **este passo leva 35 minutos ao vivo** — 105 chamadas de ferramenta para construir
 a fachada inteira. O bloco tem 30. **Ao vivo ele não cabe**, e assistir 35 minutos de saída de
@@ -206,11 +216,11 @@ percorre o resultado. Custa a cena dos arquivos nascendo, mas o build é genuina
 
 ---
 
-### 11:15 — DEMO 3 *(slides 28–29, 20 min)*
+### 11:15 — DEMO 3 *(slides 29–30, 20 min)*
 
-**Slide 28 · passo 05 — `S`.** O build fechando verde. Mostre a cobertura e a validação.
+**Slide 29 · passo 05 — `S`.** O build fechando verde. Mostre a cobertura e a validação.
 
-**Slide 29 — o bug do fuso.** Guarde este para o fim do bloco. É um achado real, encontrado
+**Slide 30 — o bug do fuso.** Guarde este para o fim do bloco. É um achado real, encontrado
 durante a construção deste material, e a plateia sente isso.
 
 > "O banco tinha dia 4. A API devolvia dia 3. Data de calendário não tem fuso —
@@ -219,20 +229,20 @@ durante a construção deste material, e a plateia sente isso.
 
 ---
 
-### 11:35 — Fechamento *(slides 30–34, 25 min)*
+### 11:35 — Fechamento *(slides 31–35, 25 min)*
 
-**Slide 30 · passo 06 — `S`.** O documento para o fornecedor.
+**Slide 31 · passo 06 — `S`.** O documento para o fornecedor.
 
-**Slide 31 · passo 07 — `S`.** `/opsx:archive`. A pergunta que fecha o argumento:
+**Slide 32 · passo 07 — `S`.** `/opsx:archive`. A pergunta que fecha o argumento:
 *daqui a dois anos, onde alguém encontra por que `I` virou `unknown`?*
 
-**Slide 32 — o que fazer na segunda.** Leia os cinco itens devagar. É o que eles levam.
+**Slide 33 — o que fazer na segunda.** Leia os cinco itens devagar. É o que eles levam.
 
-**Slide 33 — Dona Terezinha de novo.** O fecho emocional. Deixe respirar.
+**Slide 34 — Dona Terezinha de novo.** O fecho emocional. Deixe respirar.
 
 > "Interoperabilidade não é sobre sistemas. O padrão é o meio. A pessoa é o ponto."
 
-**Slide 34 — obrigado, repositório, contato.** Q&A até 12h.
+**Slide 35 — obrigado, repositório, contato.** Q&A até 12h.
 
 ---
 
