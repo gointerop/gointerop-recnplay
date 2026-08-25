@@ -72,6 +72,22 @@ function aplicarFragmento() {
   const slide = slides[atual];
   slide.dataset.fragmento = String(fragmento);
   if (slide.dataset.mapa !== undefined) desenharNivel(fragmento);
+  if (slide.dataset.escada !== undefined) acenderDegrau(slide, fragmento);
+}
+
+/**
+ * Acende a escada de produtos ate o degrau atual.
+ *
+ * Os degraus ja respondidos ficam esmaecidos em vez de sumir: no ultimo, a
+ * escada inteira esta na tela ao mesmo tempo, e ver a pilha completa e o
+ * argumento do slide.
+ */
+function acenderDegrau(slide, ate) {
+  for (const degrau of slide.querySelectorAll('.degrau')) {
+    const n = Number(degrau.dataset.degrau);
+    degrau.classList.toggle('atual', n === ate);
+    degrau.classList.toggle('aceso', n < ate);
+  }
 }
 
 function avancar() {
