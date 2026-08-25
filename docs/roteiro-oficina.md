@@ -229,7 +229,7 @@ durante a construção deste material, e a plateia sente isso.
 
 ---
 
-### 11:35 — Fechamento *(slides 31–35, 25 min)*
+### 11:35 — Fechamento *(slides 31–37, 25 min)*
 
 **Slide 31 · passo 06 — `S`.** O documento para o fornecedor.
 
@@ -238,11 +238,36 @@ durante a construção deste material, e a plateia sente isso.
 
 **Slide 33 — o que fazer na segunda.** Leia os cinco itens devagar. É o que eles levam.
 
-**Slide 34 — Dona Terezinha de novo.** O fecho emocional. Deixe respirar.
+**Slide 34 — cada projeto vira uma ilha.** A ponte do método para o produto. A frase:
+
+> "A spec resolve isso dentro de um projeto. Fazer valer entre projetos é governança de
+> interoperabilidade — e é aí que a gente entra."
+
+**Slide 35 — a escada.** Seis degraus, um por `→`. **Não é catálogo, é escada:** cada produto
+resolve um problema, e resolver esse problema revela o próximo. Leia o problema em voz alta antes
+de acender a resposta — é o problema que prende, não o nome do produto.
+
+1. *"Os sistemas não se falam."* → **aiconnect**
+2. *"Agora falam. Mas cada projeto fala um dialeto."* → **ignite**
+3. *"O dado está certo. Mas ninguém vê o paciente inteiro."* → **gocare**, com o IAGO dentro
+4. *"Vemos tudo. Mas quem autorizou?"* → **goconsent**
+5. *"E quem está do outro lado da API?"* → **gopass**
+6. O fecho: **alfred**
+
+No último degrau a escada inteira está na tela. Aponte para ela — **essa pilha é a plataforma**.
+E feche amarrando de volta às três horas anteriores:
+
+> "O ALFRED usa as APIs da própria instituição, por MCP, para gerar insight sobre os dados dela.
+> Os dados nunca saem da instituição — que é exatamente o que a gente fez hoje de manhã com a
+> fachada: traduzir sem copiar."
+
+Emenda direto na Dona Terezinha.
+
+**Slide 36 — Dona Terezinha de novo.** O fecho emocional. Deixe respirar.
 
 > "Interoperabilidade não é sobre sistemas. O padrão é o meio. A pessoa é o ponto."
 
-**Slide 35 — obrigado, repositório, contato.** Q&A até 12h.
+**Slide 37 — obrigado, repositório, contato.** Q&A até 12h.
 
 ---
 

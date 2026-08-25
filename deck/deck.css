@@ -483,3 +483,60 @@ kbd {
   line-height: 1.6;
   margin-top: .35rem;
 }
+
+/* ---------------------------------------------------------- escada -- */
+/* Cada degrau acende com um avanco de fragmento. Os ja respondidos ficam
+   esmaecidos em vez de sumir: no ultimo degrau a escada inteira esta na tela,
+   e essa pilha e a propria plataforma. */
+
+.slide-escada { gap: .9rem; }
+
+.escada { display: flex; flex-direction: column; gap: .55rem; min-height: 0; }
+
+.degrau {
+  display: grid;
+  grid-template-columns: minmax(0, 34fr) minmax(0, 66fr);
+  gap: 1.2rem;
+  align-items: baseline;
+  padding: .55rem .9rem;
+  border-left: 3px solid transparent;
+  border-radius: 0 10px 10px 0;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity .45s ease, transform .45s ease, background .45s ease;
+}
+
+.degrau.aceso {
+  opacity: .5;
+  transform: none;
+  border-left-color: rgba(63, 200, 255, .3);
+}
+
+.degrau.atual {
+  opacity: 1;
+  transform: none;
+  background: var(--card);
+  border-left-color: var(--cyan-400);
+}
+
+.degrau .problema {
+  font-size: clamp(.92rem, 1.25vw, 1.2rem);
+  font-weight: 700;
+  color: var(--white);
+  line-height: 1.35;
+}
+
+.degrau .resposta { font-size: .92em; color: var(--muted); line-height: 1.5; }
+
+.degrau .produto {
+  display: inline-block;
+  font-family: var(--mono);
+  font-weight: 700;
+  color: var(--cyan-400);
+  margin-right: .5rem;
+}
+
+/* O fecho do ALFRED nao e mais um produto na fila: e a consequencia de tudo. */
+.degrau.fecho { border-left-color: transparent; margin-top: .3rem; }
+.degrau.fecho.atual { background: rgba(0, 104, 240, .16); border-left-color: var(--blue-500); }
+.degrau.fecho .problema { color: var(--cyan-400); }
