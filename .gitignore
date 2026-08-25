@@ -27,3 +27,6 @@ tmp/
 # do modo REPLAY. Ja o arquivo parcial e o id da sessao ativa, nao.
 deck/recordings/*.parcial
 deck/recordings/.session
+
+# Saida de build do artefato, regeravel por tools/build-artefato.mjs
+dist/
