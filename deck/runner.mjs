@@ -160,14 +160,28 @@ function runLive(step) {
     return;
   }
 
-  // A gravacao vai primeiro para um arquivo temporario e so substitui a gravacao
-  // boa se a execucao terminar bem. Sem isso, uma tentativa LIVE que falha no
-  // palco — autenticacao expirada, rede caida — apagaria justamente o REPLAY que
-  // serviria de rede de seguranca para aquele passo.
+  // A gravacao vai primeiro para um arquivo temporario, e so vira gravacao se o
+  // passo ainda nao tiver uma. Uma execucao LIVE aqui e apresentacao ou teste,
+  // nao sessao de gravacao: sobrescrever destruiria justamente o REPLAY que
+  // serve de rede de seguranca. Para regravar de proposito, use
+  // tools/run-step.mjs, que sobrescreve por ser essa a sua funcao.
   const parcial = gravacaoDe(step.id) + '.parcial';
+  // O diretorio e garantido a cada passo, e nao so na subida: ele pode
+  // desaparecer no meio da sessao — uma troca de branch remove um diretorio que
+  // ficou sem arquivo rastreado.
+  mkdirSync(REC_DIR, { recursive: true });
   const rec = createWriteStream(parcial);
   const proc = spawn(CLAUDE.comando, argv, { cwd: ROOT, shell: CLAUDE.shell });
-  proc.stdin.write(step.prompt);
+  // A instrucao de idioma vai tambem no corpo do prompt, e nao so em
+    // --append-system-prompt: sozinha, a instrucao de sistema nao venceu o
+    // idioma do restante do prompt, e o agente respondia em ingles.
+    proc.stdin.write(STEPS.instrucaoDeSistema
+      ? `${STEPS.instrucaoDeSistema}
+
+---
+
+${step.prompt}`
+      : step.prompt);
   proc.stdin.end();
 
   broadcast('step-start', { id: step.id, title: step.title, mode: 'live' });
@@ -186,14 +200,31 @@ function runLive(step) {
   proc.stderr.on('data', (c) => broadcast('stderr', { text: c.toString('utf8') }));
 
   proc.on('close', (code) => {
+    // Nada aqui pode lancar: uma excecao neste callback derruba o servidor
+    // inteiro, e no palco isso significa perder o deck no meio da oficina.
     rec.end(() => {
-      if (code === 0 && statSync(parcial).size > 0) {
-        renameSync(parcial, gravacaoDe(step.id));
-      } else {
-        try { unlinkSync(parcial); } catch { /* ja removido */ }
+      try {
+        if (code === 0 && statSync(parcial).size > 0 && !temGravacao(step.id)) {
+          renameSync(parcial, gravacaoDe(step.id));
+          console.log(`  gravacao do passo ${step.id} criada`);
+        } else {
+          if (temGravacao(step.id)) {
+            console.log(`  passo ${step.id} ja tinha gravacao — preservada`);
+          }
+          unlinkSync(parcial);
+        }
+      } catch (e) {
+        console.error('  aviso: nao foi possivel salvar a gravacao —', e.message);
       }
     });
-    if (first && code === 0) writeFileSync(STATE, session, 'utf8');
+    try {
+      if (first && code === 0) {
+        mkdirSync(REC_DIR, { recursive: true });
+        writeFileSync(STATE, session, 'utf8');
+      }
+    } catch (e) {
+      console.error('  aviso: nao foi possivel gravar a sessao —', e.message);
+    }
     running = null;
     broadcast('step-end', { id: step.id, code });
   });
