@@ -244,7 +244,12 @@ function materializar(step) {
   if (!step.materializa?.length) return;
   const ref = STEPS.referenciaMaterializacao ?? 'main';
   try {
-    execFileSync('git', ['checkout', ref, '--', ...step.materializa], { cwd: ROOT });
+    // git archive extrai sem tocar no indice. Um "git checkout ref -- dir" faria
+    // o mesmo no disco, mas deixaria os arquivos preparados para commit -- e foi
+    // assim que openspec/ e fhir-facade/ acabaram versionados na branch do palco.
+    const tar = execFileSync('git', ['archive', ref, '--', ...step.materializa],
+      { cwd: ROOT, maxBuffer: 64 * 1024 * 1024 });
+    execFileSync('tar', ['-x'], { cwd: ROOT, input: tar });
     scheduleTree();
     console.log(`  materializado de ${ref}: ${step.materializa.join(', ')}`);
   } catch (e) {
