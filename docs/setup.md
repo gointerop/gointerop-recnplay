@@ -131,5 +131,15 @@ docker compose -f legacy-db/docker-compose.yml up -d
 | `main` | material completo — specs, fachada, deck, tudo pronto |
 | `palco-inicio` | estado inicial da oficina: evidências, banco e deck, **sem** `openspec/` e `fhir-facade/` |
 
+A invariante do `palco-inicio` tem **duas partes**, e a segunda já foi perdida uma vez:
+
+```bash
+git diff --name-only main palco-inicio -- . ':(exclude)openspec' ':(exclude)fhir-facade'   # deve sair vazio
+git ls-tree -r --name-only palco-inicio | grep -E '^(openspec|fhir-facade)/'               # deve sair vazio
+```
+
+Um `git checkout main -- .` para alinhar a branch traz junto os dois diretórios que existem
+justamente para nascer ao vivo — e o commit seguinte os versiona. Confira as duas partes.
+
 Para preparar o palco: `git checkout palco-inicio`.
 Para resgatar o resultado pronto no meio da demo: `git checkout main -- openspec fhir-facade`.

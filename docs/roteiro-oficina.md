@@ -27,10 +27,22 @@ Faça na véspera, e refaça na manhã do dia. Leva dez minutos e cobre tudo o q
 
 ### Manhã do dia (28/08, até 8h40)
 
-- [ ] Docker aberto e contêiner de pé **60 minutos antes** — não deixe para 8h55
-- [ ] `node deck/runner.mjs` e abrir `http://localhost:4173`
+**Um comando só**, no diretório do repositório:
+
+```bash
+node tools/palco.mjs
+```
+
+Ele confere o toolchain, garante que o palco está no estado inicial, abre o Docker Desktop se
+estiver fechado, sobe o banco, valida as 7 gravações e serve o deck em `http://localhost:4173`.
+Para no primeiro problema, com o conserto escrito.
+
+Só o diagnóstico, sem subir nada: `node tools/palco.mjs --so-checar`
+
+- [ ] Rodar **60 minutos antes** — não deixe para 8h55
+- [ ] Confirmar `claude` autenticado (o script acusa se não responder, mas sessão expirada só
+      falha na hora do uso — rode `claude` uma vez para ter certeza)
 - [ ] Verificar que o painel lateral abre no slide 20 (primeiro passo)
-- [ ] Confirmar `claude` autenticado, de novo
 - [ ] Notificações e atualizações do sistema desligadas
 - [ ] Slide 1 na tela, plateia entrando
 
